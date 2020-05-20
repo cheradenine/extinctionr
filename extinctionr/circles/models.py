@@ -1,15 +1,17 @@
-from django.core.exceptions import MultipleObjectsReturned
-from django.db import models
-from django.urls import reverse
-from contacts.models import Contact
-from extinctionr.utils import get_contact
-from django.utils.timezone import now
-from django.utils.functional import cached_property
-from markdownx.models import MarkdownxField
 from collections import defaultdict
 import json
 
+from django.core.exceptions import MultipleObjectsReturned
+from django.db import models
+from django.urls import reverse
+from django.utils.timezone import now
+from django.utils.functional import cached_property
+from markdownx.models import MarkdownxField
+from taggit.managers import TaggableManager
+from taggit.models import TaggedItemBase
 
+from contacts.models import Contact
+from extinctionr.utils import get_contact
 
 ROLE_CHOICES = {
     'int': 'Internal Coordinator',
@@ -304,4 +306,14 @@ class Signup(models.Model):
     for key in json_fields:
         exec ('def {0}(self):\n    return self.data.get("{0}", None)'.format(key))
 
-    
+
+class TaggedVolunteerRequest(TaggedItemBase):
+    content_object = models.ForeignKey('VolunteerRequest', on_delete=models.CASCADE)
+
+
+class VolunteerRequest(models.Model):
+    created = models.DateTimeField(db_index=True, auto_now_add=True)
+    contact = models.ForeignKey(Contact, null=True, blank=True, on_delete=models.SET_NULL)
+    tags = TaggableManager(through=TaggedVolunteerRequest)
+    message = models.TextField(blank=True, default='')
+

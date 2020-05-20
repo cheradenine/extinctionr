@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Circle, CircleMember, MembershipRequest, CircleJob, Couch, Signup
+from .models import Circle, CircleMember, MembershipRequest, CircleJob, Couch, Signup, VolunteerRequest
 from extinctionr.utils import get_contact
 from markdownx.admin import MarkdownxModelAdmin
 
@@ -87,3 +87,20 @@ class CouchAdmin(MarkdownxModelAdmin):
 class SignupAdmin(admin.ModelAdmin):
     readonly_fields = ('created', 'contact') + Signup.json_fields + ('raw_data', )
     list_display = ('contact', 'created', ) + Signup.json_fields
+
+
+@admin.register(VolunteerRequest)
+class VolunteerRequestAdmin(admin.ModelAdmin):
+    readonly_fields = ('created', 'contact', 'message')
+    list_display = ('contact', 'contact_email', 'contact_city', 'created')
+    list_filter = ('tags', 'contact__address__city')
+
+    def contact_email(self, obj):
+        return obj.contact.email
+
+    contact_email.short_description = 'email'
+
+    def contact_city(self, obj):
+        return obj.contact.address.city
+    
+    contact_city.short_description = 'city'

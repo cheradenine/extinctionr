@@ -27,3 +27,5 @@ postorius
 wagtail
 wagtailfontawesome
 -e git+https://github.com/cheradenine/wagtail-markdown@f95c76991066832a0c8ba29eb0ea5f3ea65a1694#egg=wagtail-markdown
+PyJWT
+

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}:: Volunteer{% endblock %}
+{% block og_tags %}
+{% endblock %}
+{% block inline_css %}
+{{block.super}}
+
+.form-group label {
+	font-size: .9em;
+    font-family: FucXed, sans-serif;
+}
+hr.pink {
+	border-bottom: 2px solid rgb(237,155,196);
+}
+{% endblock %}
+{% block content %}
+<div class="row">
+	<div class="banner position-relative w-100">
+		<img class="img-fluid w-100" src="{% static 'images/banner-volunteer.jpg' %}" alt="Extinction Rebellion Massachusetts" />
+		<div class="banner-title text-uppercase">VOLUNTEER</div>
+	</div>
+</div>
+  
+<div class="row px-2 pt-lg-5 py-3 bg-white">
+	<div class="col col-text offset-lg-2">
+		<p>We need you – whoever you are, however much time you have – to help build a powerful movement.<br>
+		Our vision of change involves mass participation. Together we’re unstoppable.</p>
+
+		<p>Thank you for your interest in volunteering with XR! Please fill out the information 
+		   below and we will contact you.</p>
+	</div>
+</div>
+<div class="row justify-content-center pb-2 bg-white act-now-block">
+	<div class="col-md-8 bg-white">
+	<form class="px-lg-4 px-2" action="/circle/person/volunteer/" method="post">
+		{% csrf_token %}
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				<label for="{{form.first_name.id_for_label}}">First name</label>
+				{{form.first_name}}
+				<div class="text-danger">{{form.first_name.errors}}</div>
+			</div>
+			<div class="form-group col-md-6">
+				<label for="{{form.last_name.id_for_label}}">Last name</label>
+				{{form.last_name}}
+				<div class="text-danger">{{form.last_name.errors}}</div>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-4">
+				<label for="{{form.email.id_for_label}}">Email</label>
+				{{form.email}}
+				<div class="text-danger">{{form.email.errors}}</div>
+			</div>
+				<div class="form-group col-md-4">
+				<label for="{{form.phone.id_for_label}}">Phone</label>
+				{{form.phone}}
+				<div class="text-danger">{{form.phone.errors}}</div>
+			</div>
+			<div class="form-group col-md-4">
+				<label for="{{form.zipcode.id_for_label}}">Zipcode</label>
+				{{form.zipcode}}
+				<div class="text-danger">{{form.zipcode.errors}}</div>
+			</div>
+		</div>
+		<hr class="pink">
+			<div class="form-group row">
+				<div class="col-12">
+					<label for="{{form.skills.id_for_label}}">Skill and interests</label>
+				</div>
+			</div>
+			<div id="id_skills" class="ml-3 form-group row">
+				{% for pk, choice in form.skills.field.widget.choices %}
+				<div id="id_skills" class="col-md-4">
+					<label for="id_skills_{{forloop.counter0}}">
+						<input type="checkbox" id="id_skills_{{ forloop.counter0 }}" value="{{ pk }}" name="skills" />
+						{{choice}}
+					</label>
+					{% if forloop.counter|divisibleby:3 %}
+						<div class="col-12"></div>
+					{% endif %}
+				</div>
+				{% endfor %}
+				<div id="id_skill_other" class="form-group col-md-4">
+					<div class="row">
+						<div class="col-1">
+						{{form.skill_other}}
+						</div>
+						<div class="col ml-md-2 pl-0">
+						{{form.skill_other_value}}
+						</div>
+					</div>
+				</div>
+			</div>
+		<hr class="pink">
+		<div class="form-row">
+			<div class="form-group col">
+				<label for="{{form.anything_else.id_for_label}}">Anything else (optional)?</label>
+				{{form.anything_else}}
+				<div class="text-danger">{{form.anything_else.errors}}</div>
+			</div>
+			{{form.message}}
+		</div>
+		<div class="form-group row mt-2 pt-2">
+			<div class="col text-center">
+				<input class="btn btn-lg btn-primary text-uppercase" type="submit" value="Sign me up!">
+			</div>
+		</div>
+	</form>
+	</div>
+	<div class="col-12 mt-2 text-center">
+		<img src="{% static 'images/symbols/swallow_small.png' %}" width="128px">
+	</div>
+</div>
+  
+{% endblock %}

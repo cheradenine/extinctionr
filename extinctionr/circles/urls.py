@@ -16,6 +16,7 @@ urlpatterns = [
     path('person/find/', views.FindFormView.as_view(), name='find-person'),
     path('person/join/', views.SignupView.as_view(), name='signup'),
     path('person/join/export/', views.signup_export, name='export-signup'),
+    path('person/volunteer/', views.VolunteerView.as_view(), name='volunteer'),
     path('jobs/', job_view, name='jobs'),
     path('couches/', views.CouchListView.as_view(), name='couches'),
     path('<int:pk>/', views.CircleView.as_view(), name='detail'),

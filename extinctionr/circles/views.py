@@ -1,7 +1,11 @@
 from io import TextIOWrapper
 import csv
+from datetime import datetime
+import jwt
+import bleach
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -11,10 +15,11 @@ from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse, HttpResponseRedirect
 from django import forms
 from django.views import generic
-from extinctionr.utils import get_contact, get_last_contact, set_last_contact
-from .models import Circle, Contact, CircleJob, Couch, LEAD_ROLES, Signup
-from . import get_circle
 
+from extinctionr.utils import get_contact, get_last_contact, set_last_contact
+from .models import Circle, Contact, CircleJob, Couch, LEAD_ROLES, Signup, VolunteerRequest
+from . import get_circle
+from .util import zipcode_lookup
 from .forms import FindPeopleForm, MembershipRequestForm, ContactForm, CouchForm, ContactAutocomplete, IntakeForm
 
 
@@ -216,6 +221,66 @@ class SignupView(BaseCircleView, FormView):
         initial['working_group'] = 'UNKNOWN'
         initial['committment'] = 'full'
 
+        return initial
+
+class VolunteerView(FormView):
+    template_name = 'pages/welcome/volunteer.html'
+    form_class = IntakeForm
+
+    def decode_token(self, jwt_token):
+        obj = jwt.decode(jwt_token.encode('UTF-8'), settings.SECRET_KEY, algorithms=['HS256'])
+        served_at = datetime.fromisoformat(obj['served'])
+        delta_seconds = (datetime.now() - served_at).seconds
+        if delta_seconds < 10:
+            raise ValueError
+
+    def form_valid(self, form):
+        data = form.cleaned_data
+        jwt_token = data['message']
+        try:
+            self.decode_token(jwt_token)
+        except:
+            return HttpResponseRedirect('/')
+
+        postcode=data['zipcode']
+        city, state = zipcode_lookup(postcode)
+        person = get_contact(
+            email=data['email'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            postcode=data['zipcode'],
+            city=city,
+            state=state,
+            phone=data['phone'])
+        person.tags.add('volunteer')
+        skills = data['skills']
+
+        message = bleach.clean(data['anything_else'])
+        if data["skill_other"]:
+            other_skill = bleach.clean(data["skill_other_value"])
+            # was going to make this another skill tag but don't want random users
+            # adding tags
+            message = 'otherskill: {0}\nmessage: {1}'.format(other_skill, message)
+
+        volunteer = VolunteerRequest(contact=person, message=message)
+        volunteer.save()
+        for skill in skills:
+            volunteer.tags.add(skill)
+
+        set_last_contact(self.request, person)
+        messages.success(self.request, "Thank you for volunteering! We will contact you soon.")
+        return HttpResponseRedirect('/welcome/guide')
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = super().get_initial()
+        now = datetime.now().isoformat()
+        token = jwt.encode({'served':now}, settings.SECRET_KEY, algorithm='HS256')
+        # todo: would be cool to move this into the field at runtime
+        # to further thwart the bots.
+        initial['message'] = token.decode('UTF-8')
         return initial
 
 

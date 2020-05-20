@@ -5,16 +5,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="row pt-5">
+<div class="row p-5">
 	<div class="col-text">
 		<h1 class="xr-green text-center">XR Mass Rebels’ Welcome Manual</h1>
-		<p><a href="https://rebellion.earth/the-truth/about-us/">XR Principles &amp; Values</a></p>
-		<p><a href="https://extinctionrebellion.us/demands">Our Demands</a></p>
+		<p><a href="{% url 'extinctionr.info:page' page='about' %}#principles">XR Principles &amp; Values</a></p>
+		<p><a href="{% url 'extinctionr.info:page' page='demands' %}">Our Demands</a></p>
 		<p><a href="https://xrmass.org/wiki/">XR Mass Resources</a></p>
 
 
 <h3 class="text-center">How do I get involved?</h3>
-<p>After your onboarding meeting, a fellow rebel will call you up in a few days to check in. Since there are many ways to be involved in XR Mass, they can help direct you to your next steps. Broadly speaking:
+<p>After your onboarding meeting, a fellow rebel will call you up in a few days to check in.
+<p>Note: for online sign-ups a member will be in touch via email to schedule the call.
+<p> Since there are many ways to be involved in XR Mass, they can help direct you to your next steps. Broadly speaking:
 
 <h4>working groups (WGs)</h4>
 <p><em>organize events and actions behind the scenes</em></p>
@@ -26,12 +28,9 @@
 			<li>WG-specific meeting information: calendar and minutes</li>
 		</ul>
 	</li>
-{% if user.is_authenticated %}<li>You can <a href="{% url 'circles:person-me' %}">see which groups you've joined</a></li>{% endif %} 
-	<li>To get an idea of potential roles within a WG, explore <a href="/circle/">the circle directory</a></li>
-	<li><a href="/circle/jobs/">The job page</a> lists some high-priority roles of various commitment levels that need to be filled</li>
 </ul>
 <h4>Affinity groups (AGs)</h4>
-<p><em>execute actions, including non-violent civil disobedience</em></p>
+<p><em>execute actions, including non-violent direct action</em></p>
 <ul>
 	<li>There may be an upcoming action you can attend in a low/no-risk role. <a href="/action/">View upcoming actions and events</a></li>
 	<li>Attend an upcoming XR non-violent direct action training to carry out civil disobedience and join an AG</li>
@@ -43,56 +42,12 @@
 <p><a href="/wiki/org-structure/">Read more on XR Mass structure</a>, including WGs and AGs</p>  
 
 <h3 class="text-center mt-5">How to find information and ask questions</h3>
-<p>Our <a href="/wiki/">resources page</a> is always the first place to check. If you have a question:</p>
+<p>Our <a href="/wiki/">wiki</a> is always the first place to check. If you have a question:</p>
 <ol>
 <li>Check if it’s answered on our website, particularly our resources page</li>
 <li>Check if it falls under the domain of a particular WG, and email them as indicated on their homepage</li>
 <li>Send an email to <a href="mailto:xr.boston.outreach@protonmail.com">xr.boston.outreach@protonmail.com</a></li>
 </ol>
-
-<h3 class="text-center mt-5">Communications</h3>
-
-<p>XR Mass has a few different ways of organizing and communicating online. Since all of these channels are public, be aware of the sensitivity of the information you share.</p>
-<ol>
-		{% if not user.is_authenticated %}
-	<li><a href="/register/">Register for an account on our website</a>. This will enable WG coordinators to add you to roles within the WG. You can also <a href="/circle/">request to join a WG</a>.</li>
-		{% endif %}
-	<li>Keybase is a secure, end-to-end encrypted messaging app which XR US chapters have been using to communicate (with each other, and internally).
-		<ul>
-			<li><a href="http://bit.ly/keybase-starter">How to install and intro</a></li>
-			<li><a href="http://bit.ly/xrus_keybase">Detailed guide</a></li>
-			<li>To join the XR Mass chapter, find Dave by clicking in the top left corner and typing in <code><a href="https://keybase.io/timelessway">timelessway</a></code>. Send him a message that says “Add me to XR Mass”.</li>
-		</ul>
-	</li>
-	<li>Email communication
-		<ul>
-			<li>While not a requirement, it is highly recommended that XR members use Protonmail for secure email communication. Emails between Protonmail users are automatically encrypted. <strong>Note that emails sent from Protonmail to a non-proton email address are not encrypted.</strong> Sign up for a for Proton email account at: <a href="https://protonmail.com">protonmail.com</a></li>
-		</ul>
-	<li>Email lists
-		<ul>
-			<li>WG and AG coordinators can add you to their group email list or Keybase channel.</li>
-			<!-- <li>Action Network is a large email list (~1000 people) where we send out public action and event announcements: https://xrmass.org/join</li> -->
-			<li>bostonarea@lists.xrmass.org is a moderated email list for people working in XR to 1) make announcements about events or meetings, and 2) ask for help with a task or event. You will be added to this list after your orientation.</li>
-		</ul>
-	</li>
-	<li>Security Considerations
-		<ul>
-			<li>Online security is extremely hard to achieve. We prefer keeping documentation in the open when possible.</li>
-			<li>Be careful not to post personal identification in documentation online: full names, email addresses, etc. For example if we have a point of contact for another organization, or even posting contact info for another member without their permission.</li>
-			<li>For highly sensitive communications consider Signal or an in person meeting.</li>
-		</ul>
-	</li>
-</ol>
-
-
-
-
-
-
-	<h4 class="mt-5 text-center">This Site</h4>
-	<p>If you need permission to create press releases, events, etc. on this site, email <a href="mailto:webmaster@xrmass.org">webmaster@xrmass.org</a>. If you want to modify other parts of the site, <a href="https://github.com/davestgermain/extinctionr">it's open source!</a>.</p>
-
-
 
 	</div>
 </div>

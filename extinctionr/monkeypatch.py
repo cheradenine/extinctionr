@@ -28,7 +28,7 @@ def do_monkeypatch():
     # overriding the default admin to add some features
     @admin.register(Contact)
     class ContactAdmin(admin.ModelAdmin):
-        search_fields = ('first_name', 'last_name', 'email')
+        search_fields = ('first_name', 'last_name', 'email', 'postcode')
         list_display = ('email', 'first_name', 'last_name', 'phone', 'created_on')
         list_filter = ('tags', 'address__city')
         list_select_related = ('address', )
