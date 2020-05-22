@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load tz %}
 {% load static %}
-{% load news %}
+{% load news vaquita %}
 {% load wagtailcore_tags wagtailimages_tags %}
 {% block extrahead %}
 <link rel="stylesheet" href="{% static "css/flickity.min.css"%}" media/>
@@ -59,7 +59,7 @@
             <div>
             <!-- consider a separate grid here with rows for each block -->
             {% for block in page.content %}
-              {% include_block block%}
+              {% include_block block %}
             {% endfor %}
             </div>
         </div>
@@ -70,18 +70,18 @@
               <span class="text-fucxed d-4">Share</span>
             </li>
             <li class="list-inline-item">
-              <a href="{{page|share_url:"fb"}}" target="_blank" class="social-share">
+              <a href="{% social_url page.url 'fb' page.title %}" target="_blank" class="social-share">
                   <i class="fab fa-facebook"></i>
               </a>
             </li>
             <li class="list-inline-item">
-              <a href="{{page|share_url:"twitter"}}" target="_blank" class="social-share">
+              <a href="{% social_url page.url 'twitter' page.title %}" target="_blank" class="social-share">
                   <i class="fab fa-twitter"></i>
               </a>
             </li>
             
             <li class="list-inline-item">
-              <a href="{{page|share_url:"email"}}" target="_blank" class="social-share">
+              <a href="{% social_url page.url 'email' page.title %}" target="_blank" class="social-share">
                   <i class="fas fa-envelope"></i>
               </a>
             </li>

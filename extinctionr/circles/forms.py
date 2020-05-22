@@ -59,7 +59,7 @@ VOLUNTEER_SKILL_CHOICES = [
     ("music", "Music"),
 	("video", "Video"),
     ("finance", "Finance"),
-    ("comms", "Social Media"),
+    ("social", "Social Media"),
     ("comms", "Communications"),
     ("strategy", "Strategy"),
     ("tech", "Tech"),
@@ -89,6 +89,10 @@ class IntakeForm(forms.Form):
     zipcode = forms.CharField(
         required=True, 
         widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    volunteer = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'data-toggle': 'collapse', 'data-target' : '#volunteer_form'})
     )
     skills = forms.MultipleChoiceField(
         required=False,

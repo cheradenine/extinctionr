@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}:: Volunteer{% endblock %}
+{% block title %}:: Join Us{% endblock %}
 {% block og_tags %}
 {% endblock %}
+
 {% block inline_css %}
 {{block.super}}
 
+.fac-checkbox label,
 .form-group label {
 	font-size: .9em;
     font-family: FucXed, sans-serif;
@@ -13,22 +15,26 @@
 hr.pink {
 	border-bottom: 2px solid rgb(237,155,196);
 }
+.big-label {
+	font-size: 1.2em;
+}
+.volunteer-callout {
+/*	background-color: rgb(237,155,196); */
+	background-color: rgb(117, 208, 241);
+}
+
 {% endblock %}
 {% block content %}
 <div class="row">
 	<div class="banner position-relative w-100">
 		<img class="img-fluid w-100" src="{% static 'images/banner-volunteer.jpg' %}" alt="Extinction Rebellion Massachusetts" />
-		<div class="banner-title text-uppercase">VOLUNTEER</div>
+		<div class="banner-title text-uppercase">JOIN US</div>
 	</div>
 </div>
   
 <div class="row px-2 pt-lg-5 py-3 bg-white">
 	<div class="col col-text offset-lg-2">
-		<p>We need you – whoever you are, however much time you have – to help build a powerful movement.<br>
-		Our vision of change involves mass participation. Together we’re unstoppable.</p>
-
-		<p>Thank you for your interest in volunteering with XR! Please fill out the information 
-		   below and we will contact you.</p>
+		<p>Add your name to receive our weekly email newsletter to find out about upcoming actions, community meetings and other events.</p>
 	</div>
 </div>
 <div class="row justify-content-center pb-2 bg-white act-now-block">
@@ -64,6 +70,15 @@ hr.pink {
 				<div class="text-danger">{{form.zipcode.errors}}</div>
 			</div>
 		</div>
+		<div form-row>
+			<div class="form-group volunteer-callout px-2 pt-1">
+				{{form.volunteer}}
+				<label for="{{form.volunteer.id_for_label}}">
+					This is an emergency! I want to get involved with the rebellion!
+				</label>
+			</div>
+		</div>
+		<div id="volunteer_form" class="collapse">
 		<hr class="pink">
 			<div class="form-group row">
 				<div class="col-12">
@@ -101,6 +116,7 @@ hr.pink {
 				<div class="text-danger">{{form.anything_else.errors}}</div>
 			</div>
 			{{form.message}}
+		</div>
 		</div>
 		<div class="form-group row mt-2 pt-2">
 			<div class="col text-center">

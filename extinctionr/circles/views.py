@@ -20,7 +20,10 @@ from extinctionr.utils import get_contact, get_last_contact, set_last_contact
 from .models import Circle, Contact, CircleJob, Couch, LEAD_ROLES, Signup, VolunteerRequest
 from . import get_circle
 from .util import zipcode_lookup
-from .forms import FindPeopleForm, MembershipRequestForm, ContactForm, CouchForm, ContactAutocomplete, IntakeForm
+from .forms import (
+    FindPeopleForm, MembershipRequestForm, ContactForm, 
+    CouchForm, ContactAutocomplete, IntakeForm,
+    VOLUNTEER_SKILL_CHOICES)
 
 
 @login_required
@@ -223,8 +226,8 @@ class SignupView(BaseCircleView, FormView):
 
         return initial
 
-class VolunteerView(FormView):
-    template_name = 'pages/welcome/volunteer.html'
+class VolunteerFormView(FormView):
+    template_name = 'pages/welcome/join.html'
     form_class = IntakeForm
 
     def decode_token(self, jwt_token):
@@ -268,7 +271,15 @@ class VolunteerView(FormView):
             volunteer.tags.add(skill)
 
         set_last_contact(self.request, person)
-        messages.success(self.request, "Thank you for volunteering! We will contact you soon.")
+        if data['volunteer']:
+            msg = "Thank you for volunteering! We will contact you soon."
+        else:
+            msg = "Thank you for signing up for our newsletter!"
+
+        # Save contact to ActionNetworks
+        #add_to_action_networks(person)
+
+        messages.success(self.request, msg)
         return HttpResponseRedirect('/welcome/guide')
 
     def get_initial(self):
@@ -452,3 +463,40 @@ def signup_export(request):
             csv_writer.writerow(row)
         return resp
 
+
+@login_required
+def volunteer_export(request):
+    if request.user.has_perm('contacts.view_contact'):
+        resp = HttpResponse(content_type='text/csv')
+        resp['Content-Disposition'] = 'attachment; filename="volunteers.csv"'
+        csv_writer = csv.writer(resp)
+        header = [
+            'Created', 'Email', 'First Name', 'Last Name', 
+            'Phone', 'City', 'State', 'Zipcode', 
+            'Message'
+        ]
+        skill_tags = VOLUNTEER_SKILL_CHOICES
+        skill_header = [skill[1] for skill in VOLUNTEER_SKILL_CHOICES]
+        header = header + skill_header
+        csv_writer.writerow(header)
+        volunteers = VolunteerRequest.objects.all()
+        for volunteer in VolunteerRequest.objects.all():
+            contact = volunteer.contact
+            address = contact.address
+            # art, social, foo
+            # 'True', 'False', 'True', etc.
+            skills = set(volunteer.tags.names())
+            skill_data = [str(skill[0] in skills) for skill in skill_tags]
+
+            csv_writer.writerow((
+                volunteer.created.isoformat(),
+                contact.email,
+                contact.first_name,
+                contact.last_name,
+                contact.phone,
+                address.city if address else None,
+                address.state if address else None,
+                address.postcode if address else None,
+                volunteer.message,
+                *skill_data))
+        return resp

@@ -5,8 +5,12 @@ from django.conf import settings
 from django.dispatch import receiver
 from crum import get_current_user
 
-from .models import Circle, CircleMember, MembershipRequest, CircleJob, Signup
+from .models import (
+    Circle, CircleMember, MembershipRequest, 
+    CircleJob, Signup, Contact
+)
 from . import comm, git, get_circle
+from .anapi import add_to_action_networks
 
 
 @receiver(post_save, sender=MembershipRequest)
@@ -40,4 +44,11 @@ def send_signup_email(sender, instance, **kwargs):
     outreach_circle = get_circle('outreach')
     if outreach_circle:
         comm.notify_new_signup(outreach_circle, instance)
+
+
+@receiver(post_save, sender=Contact)
+def send_contact_to_action_networks(sender, instance, **kwargs):
+    contact = instance
+    add_to_action_networks(contact)
+
 
