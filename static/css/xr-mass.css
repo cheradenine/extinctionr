@@ -20,7 +20,7 @@ body {
 }
 
 
-h1,h2,h3,h4,h5,h6,.btn-fucxed,.text-fucxed,.btn-primary {
+h1,h2,h3,h4,h5,h6,.btn-fucxed,.text-fucxed,.btn-primary, .btn-secondary {
     font-family: FucXed, sans-serif;
 }
 
@@ -975,6 +975,18 @@ p.btn-row>a:last-child {
     background-color: rgb(102, 48, 101) !important; 
 }
 
+.btn-secondary {
+  text-decoration: none;
+  color: white !important;
+  border-style: none;
+  font-size: 1rem;
+  padding: .5rem 1.75rem;
+}
+/*
+.btn-secondary:hover, .btn-secondary:focus {
+  background-color: rgb(102, 48, 101) !important; 
+}
+*/
 .donate-btn {
     padding: .5rem 1.5rem;
     font-size: 1.2rem;

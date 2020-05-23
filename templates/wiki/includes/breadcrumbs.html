@@ -3,12 +3,13 @@
 <nav aria-label="breadcrumb" id="article-breadcrumbs">
   <ul class="breadcrumb border-bottom d-print-none">
     {% for ancestor in urlpath.cached_ancestors %}
-      <li class="breadcrumb-item"><a href="{% url 'wiki:get' path=ancestor.path %}">{{ ancestor.article.current_revision.title|truncatechars:25 }}</a></li>
+      <li class="breadcrumb-item {% if forloop.first %}ml-autoxx{% endif %}"><a href="{% url 'wiki:get' path=ancestor.path %}">{{ ancestor.article.current_revision.title|truncatechars:25 }}</a></li>
     {% endfor %}
     <li class="breadcrumb-item active">{{ article.current_revision.title|truncatechars:25 }}</li>
-    <li class="breadcrumb-item btn-group ml-auto" role="group">
+    <li class="breadcrumb-item btn-group " role="group">
       <div class="btn-group" role="group">
           <button class="btn btn-secondary dropdown-toggle" id="wiki-dropdown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% trans "Sub-articles for" %} {{ article.current_revision.title }}">
+            <i class="fas fa-folder"></i>
           </button>
           <div class="dropdown-menu" aria-labelledby="wiki-dropdown">
             {% for child in children_slice %}
@@ -26,6 +27,7 @@
       </div>
       <div class="btn-group" role="group">
         <button class="btn btn-secondary dropdown-toggle" id="wiki-article-dropdown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% trans "Sub-articles for" %} {{ article.current_revision.title }}">
+          <i class="fas fa-folder-plus"></i>
         </button>
         <div class="dropdown-menu" aria-labelledby="wiki-article-dropdown">
             {% if urlpath.parent %}

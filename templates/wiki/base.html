@@ -10,10 +10,21 @@
 .wiki-footer {
   font-size: .5em;
 }
+.breadcrumb-item {
+  text-align: right;
+}
+.breadcrumb-item .dropdown-toggle {
+  padding: 1px 24px;
+}
+.breadcrumb-item .dropdown-item {
+  font-family: FucXed, sans-serif;
+  font-size: .8rem;
+  color: rgb(255, 193, 30);
+}
 {% endblock %}
 {% block content %}
     {% block wiki_body %}
-    <div class="container-fluid">
+    <div class="container-fluid pb-1">
 
       {% wiki_messages %}
 
