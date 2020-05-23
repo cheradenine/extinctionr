@@ -14,7 +14,6 @@ urlpatterns = [
     path('person/export/', views.csv_export, name='person-export'),
     path('person/autocomplete/', views.ContactAutocomplete.as_view(), name='person-autocomplete'),
     path('person/find/', views.FindFormView.as_view(), name='find-person'),
-    path('person/join/', views.VolunteerFormView.as_view(), name='join'),
     path('person/volunteer/export', views.volunteer_export, name='export-volunteer'),
     path('jobs/', job_view, name='jobs'),
     path('couches/', views.CouchListView.as_view(), name='couches'),

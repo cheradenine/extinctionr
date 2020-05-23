@@ -33,13 +33,13 @@ hr.pink {
 </div>
   
 <div class="row px-2 pt-lg-5 py-3 bg-white">
-	<div class="col col-text offset-lg-2">
+	<div class="col-8 col-text offset-lg-2">
 		<p>Add your name to receive our weekly email newsletter to find out about upcoming actions, community meetings and other events.</p>
 	</div>
 </div>
-<div class="row justify-content-center pb-2 bg-white act-now-block">
+<div class="row justify-content-center pb-2 bg-white">
 	<div class="col-md-8 bg-white">
-	<form class="px-lg-4 px-2" action="/circle/person/volunteer/" method="post">
+	<form action="{% url 'extinctionr.info:join' %}" method="post">
 		{% csrf_token %}
 		<div class="form-row">
 			<div class="form-group col-md-6">
@@ -70,8 +70,8 @@ hr.pink {
 				<div class="text-danger">{{form.zipcode.errors}}</div>
 			</div>
 		</div>
-		<div form-row>
-			<div class="form-group volunteer-callout px-2 pt-1">
+		<div class="form-row">
+			<div class="form-group col-12 volunteer-callout px-2 pt-1">
 				{{form.volunteer}}
 				<label for="{{form.volunteer.id_for_label}}">
 					This is an emergency! I want to get involved with the rebellion!
@@ -79,7 +79,7 @@ hr.pink {
 			</div>
 		</div>
 		<div id="volunteer_form" class="collapse">
-		<hr class="pink">
+			<hr class="pink">
 			<div class="form-group row">
 				<div class="col-12">
 					<label for="{{form.skills.id_for_label}}">Skill and interests</label>
@@ -108,24 +108,24 @@ hr.pink {
 					</div>
 				</div>
 			</div>
-		<hr class="pink">
-		<div class="form-row">
-			<div class="form-group col">
-				<label for="{{form.anything_else.id_for_label}}">Anything else (optional)?</label>
-				{{form.anything_else}}
-				<div class="text-danger">{{form.anything_else.errors}}</div>
+			<hr class="pink">
+			<div class="form-row">
+				<div class="form-group col">
+					<label for="{{form.anything_else.id_for_label}}">Anything else (optional)?</label>
+					{{form.anything_else}}
+					<div class="text-danger">{{form.anything_else.errors}}</div>
+				</div>
+				{{form.message}}
 			</div>
-			{{form.message}}
 		</div>
-		</div>
-		<div class="form-group row mt-2 pt-2">
-			<div class="col text-center">
+		<div class="form-row">
+			<div class="form-group col-12 text-center mt-2 pt-2">
 				<input class="btn btn-lg btn-primary text-uppercase" type="submit" value="Sign me up!">
 			</div>
 		</div>
 	</form>
 	</div>
-	<div class="col-12 mt-2 text-center">
+	<div class="col-12 my-2 text-center">
 		<img src="{% static 'images/symbols/swallow_small.png' %}" width="128px">
 	</div>
 </div>

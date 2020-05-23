@@ -13,7 +13,7 @@ AN_HEADERS = {
 logger = logging.getLogger('circles.anapi')
 
 def _get_people_api():
-    if AN_HEADERS['OSDI-API=Token'] == 'Debug':
+    if AN_HEADERS['OSDI-API-Token'] == 'Debug':
         return None
 
     resp = requests.get(AN_ENTRY_POINT, headers=AN_HEADERS)

@@ -10,6 +10,7 @@ urlpatterns = [
     path('register/', views.RegistrationView.as_view(), name='register'),
     path('contact', views.ContactView.as_view(), name="contact"),
     path('groups/', views.list_chapters, name='groups'),
+    path('join/', views.SignupFormView.as_view(), name='join'),
     path('', views.InfoView.as_view(), kwargs={'page': 'home'}, name='index'),
     views.wrap_info_path(path('<path:page>', views.InfoView.as_view(), name='page')),
 ]

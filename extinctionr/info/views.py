@@ -1,21 +1,30 @@
+from datetime import datetime
+import bleach
 from hashlib import md5
+import jwt
 
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.core import serializers
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.loader import TemplateDoesNotExist, get_template
+from django.urls.exceptions import Resolver404
 from django.utils.decorators import method_decorator
 from django.utils.http import http_date
 from django.views.decorators.http import etag
 from django.views.decorators.cache import cache_page
 from django.views.generic import FormView, DetailView, ListView, TemplateView
 
+from extinctionr.circles.forms import IntakeForm
+from extinctionr.circles.util import zipcode_lookup
+from extinctionr.circles.models import VolunteerRequest
+from extinctionr.utils import get_contact, get_last_contact, set_last_contact
+
 from .models import PressRelease, Chapter
-from django.urls.exceptions import Resolver404
 
 
 class RegistrationForm(UserCreationForm):
@@ -158,3 +167,68 @@ def list_chapters(request):
     chapters = serializers.serialize("json", Chapter.objects.all())
     context = {'chapters': chapters }
     return render(request, 'pages/groups/index.html', context)
+
+
+class SignupFormView(FormView):
+    template_name = 'pages/welcome/join.html'
+    form_class = IntakeForm
+
+    def decode_token(self, jwt_token):
+        obj = jwt.decode(jwt_token.encode('UTF-8'), settings.SECRET_KEY, algorithms=['HS256'])
+        served_at = datetime.fromisoformat(obj['served'])
+        delta_seconds = (datetime.now() - served_at).seconds
+        if delta_seconds < 10:
+            raise ValueError
+
+    def form_valid(self, form):
+        data = form.cleaned_data
+        jwt_token = data['message']
+        try:
+            self.decode_token(jwt_token)
+        except:
+            return HttpResponseRedirect('/')
+
+        postcode=data['zipcode']
+        city, state = zipcode_lookup(postcode)
+        person = get_contact(
+            email=data['email'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            postcode=data['zipcode'],
+            city=city,
+            state=state,
+            phone=data['phone'])
+        person.tags.add('volunteer')
+        skills = data['skills']
+
+        message = bleach.clean(data['anything_else'])
+        if data["skill_other"]:
+            other_skill = bleach.clean(data["skill_other_value"])
+            # was going to make this another skill tag but don't want random users
+            # adding tags
+            message = 'otherskill: {0}\nmessage: {1}'.format(other_skill, message)
+
+        volunteer = VolunteerRequest(contact=person, message=message)
+        volunteer.save()
+        for skill in skills:
+            volunteer.tags.add(skill)
+
+        set_last_contact(self.request, person)
+        if data['volunteer']:
+            msg = "Thank you for volunteering! We will contact you soon."
+        else:
+            msg = "Thank you for signing up for our newsletter!"
+
+        return HttpResponseRedirect('/welcome/thankyou')
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = super().get_initial()
+        now = datetime.now().isoformat()
+        token = jwt.encode({'served':now}, settings.SECRET_KEY, algorithm='HS256')
+        # todo: would be cool to move this into the field at runtime
+        # to further thwart the bots.
+        initial['message'] = token.decode('UTF-8')
+        return initial
