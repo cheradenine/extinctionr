@@ -58,7 +58,7 @@ VOLUNTEER_SKILL_CHOICES = [
     ("art", "Art"),
     ("music", "Music"),
 	("video", "Video"),
-    ("finance", "Finance"),
+    ("finance", "Fundraising"),
     ("social", "Social Media"),
     ("comms", "Communications"),
     ("strategy", "Strategy"),

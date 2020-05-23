@@ -177,7 +177,7 @@ class SignupFormView(FormView):
         obj = jwt.decode(jwt_token.encode('UTF-8'), settings.SECRET_KEY, algorithms=['HS256'])
         served_at = datetime.fromisoformat(obj['served'])
         delta_seconds = (datetime.now() - served_at).seconds
-        if delta_seconds < 10:
+        if delta_seconds < 5:
             raise ValueError
 
     def form_valid(self, form):
@@ -198,27 +198,29 @@ class SignupFormView(FormView):
             city=city,
             state=state,
             phone=data['phone'])
-        person.tags.add('volunteer')
-        skills = data['skills']
 
-        message = bleach.clean(data['anything_else'])
-        if data["skill_other"]:
-            other_skill = bleach.clean(data["skill_other_value"])
-            # was going to make this another skill tag but don't want random users
-            # adding tags
-            message = 'otherskill: {0}\nmessage: {1}'.format(other_skill, message)
+        # TODO: should we record this?
+        ip_address = self.request.META.get('HTTP_X_FORWARDED_FOR', self.request.META.get('REMOTE_ADDR', 'unknown address'))
 
-        volunteer = VolunteerRequest(contact=person, message=message)
-        volunteer.save()
-        for skill in skills:
-            volunteer.tags.add(skill)
+        if data["volunteer"]:
+            person.tags.add('volunteer')
+            skills = data['skills']
+
+            message = bleach.clean(data['anything_else'])
+            if data["skill_other"]:
+                other_skill = bleach.clean(data["skill_other_value"])
+                # was going to make this another skill tag but don't want random users
+                # adding tags
+                message = 'otherskill: {0}\nmessage: {1}'.format(other_skill, message)
+
+            try:
+                volunteer = VolunteerRequest.objects.get(contact__email=person.email)
+            except VolunteerRequest.DoesNotExist:
+                volunteer = VolunteerRequest.objects.create(contact=person, message=message)
+            for skill in skills:
+                volunteer.tags.add(skill)
 
         set_last_contact(self.request, person)
-        if data['volunteer']:
-            msg = "Thank you for volunteering! We will contact you soon."
-        else:
-            msg = "Thank you for signing up for our newsletter!"
-
         return HttpResponseRedirect('/welcome/thankyou')
 
     def get_initial(self):
@@ -232,3 +234,11 @@ class SignupFormView(FormView):
         # to further thwart the bots.
         initial['message'] = token.decode('UTF-8')
         return initial
+
+
+def serve_thankyou(request):
+    # If there is a contact info in the session, then they entered it.
+    # Otherwise go back to join page.
+    if not request.session.get('last-contact', None):
+        return HttpResponseRedirect('/join')
+    return render(request, 'pages/welcome/thankyou.html', {})

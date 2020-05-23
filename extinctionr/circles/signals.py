@@ -47,8 +47,8 @@ def send_signup_email(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Contact)
-def send_contact_to_action_networks(sender, instance, **kwargs):
-    contact = instance
-    add_to_action_networks(contact)
+def send_contact_to_action_networks(sender, instance, created, **kwargs):
+    if created:
+        add_to_action_networks(instance)
 
 
