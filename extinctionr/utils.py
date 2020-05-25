@@ -2,41 +2,54 @@ from contacts.models import Contact, Address
 from django.conf import settings
 from django.contrib.sites.models import Site
 
-def _get_names(name):
+
+def _get_names(name, first, last):
     sname = name.split(' ', 1)
     if len(sname) == 2:
         first_name, last_name = sname
     else:
         first_name = sname[0]
         last_name = '?'
+    first_name = first if first else first_name
+    last_name = last if last else last_name
     return (first_name, last_name)
 
 
-def _update_address(user, address):
-    updated = False
-    for k, v in address.items():
-        if v and getattr(user.address, k, None) is None:
-            setattr(user.address, k, v)
-            updated = True
-    if updated:
-        user.address.save()
+def _update_model_attr(model, k, v):
+    # Updates model field if needed.
+    if v and getattr(model, k, None) != v:
+        setattr(model, k, v)
+        return True
+    return False
 
+
+def _update_model(model, **kwargs):
+    updated = False
+    for k, v in kwargs.items():
+        updated = _update_model_attr(model, k, v) or updated
+    return updated
+
+
+def _has_name(name):
+    return name not in ('', '?', 'unknown')
+            
 
 def get_contact(email, name='', first_name='', last_name='', **kwargs):
     email = email.lower().strip()
     assert email
     addr_keys = [f.name for f in Address._meta.fields]
     addr_keys.remove('id')
-    address = {}
-    for k in addr_keys:
-        if k in kwargs:
-            address[k] = kwargs.pop(k)
 
+    # Create address dict from fields in kwargs.
+    address = {k : kwargs.pop(k) for k in addr_keys if k in kwargs}
+
+    is_update = False
     try:
         user = Contact.objects.get(email=email)
+        is_update = True
     except Contact.DoesNotExist:
         if not (first_name and last_name):
-            first_name, last_name = _get_names(name)
+            first_name, last_name = _get_names(name, first_name, last_name)
         user = Contact.objects.create(
             email=email,
             first_name=first_name,
@@ -44,24 +57,23 @@ def get_contact(email, name='', first_name='', last_name='', **kwargs):
             address=Address.objects.create(**address) if address else None,
             **kwargs
         )
-    resave = False
-    for k, v in kwargs.items():
-        if v and getattr(user, k, None) is None:
-            setattr(user, k, v)
-            resave = True
-    if last_name and user.last_name in ('', '?', 'unknown'):
-        user.last_name = last_name
-        resave = True
-    if first_name and user.first_name in ('', '?', 'unknown'):
-        user.first_name = first_name
-        resave = True
+
+    resave = _update_model(user, **kwargs)
+
+    # Maybe update new name info.
+    if _has_name(last_name):
+        resave = _update_model_attr(user, 'last_name', last_name)
+    if _has_name(first_name):
+        resave = _update_model_attr(user, 'first_name', first_name)
 
     if address:
+        # User had no address.
         if not user.address:
             user.address = Address.objects.create(**address)
             resave = True
-        else:
-            _update_address(user, address)
+        elif is_update:
+            if _update_model(user.address, **address):
+                user.address.save()
 
     if resave:
         user.save()
@@ -79,6 +91,7 @@ def set_last_contact(request, contact):
         request.session['last-contact'] = contact.id
     else:
         request.session.pop('last-contact', None)
+
 
 def base_url():
     current_site = Site.objects.get_current()
