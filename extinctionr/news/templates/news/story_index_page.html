@@ -99,7 +99,7 @@ ul.page-nav li a:hover {
                     {% endwith %}
                     <div class="p-2">
                         <div><a href="{% pageurl story %}" class="blog-link blog-list-title"><strong>{{story.title}}</strong></a></div>
-                        <div class="blog-byline">By {{story.author}} | {{story.date}}</div>
+                        <div class="blog-byline">By <a href="/news/?author={{story.author_name}}">{{story.author_name}}</a> | {{story.date}}</div>
                         <p class="mt-2">{{story.lede}}</p>
                         {% for tag in story.tags.all %}
                         <span class="blog-tag mr-2 my-1"><a href="{% pageurl page %}?tag={{tag}}">{{tag}}</a></span>

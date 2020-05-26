@@ -46,7 +46,7 @@
             <h1 class="mb-1 blog-title">{{page.title}}</h1>
             <div>
                 <small>
-                By {{page.owner.username|default:"Anonymous"}} | {{page.date}}
+                By <a href="/news/?author={{page.author_name}}">{{page.author_name}}</a> | {{page.date}}
                 </small>
             </div>
             <div class="mt-2">

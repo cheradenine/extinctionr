@@ -23,8 +23,12 @@ from wagtail.snippets.models import register_snippet
 
 from wagtailmarkdown.blocks import MarkdownBlock
 
+from common.models import User
 from extinctionr.vaquita.blocks import ImageCarouselBlock
 from .blocks import EmbedContentBlock
+
+# Display name used when story is tagged as anonymous
+ANONYMOUS_AUTHOR_NAME = "Extinction Rebellion Boston"
 
 @register_snippet
 class StoryCategory(models.Model):
@@ -71,7 +75,6 @@ class StoryIndexPage(Page, Orderable):
     def get_context(self, request):
         
         context = super().get_context(request)
-
         
         stories = StoryPage.objects.live() #child_of(self).live()
         stories = stories.order_by('-first_published_at')
@@ -119,6 +122,14 @@ class FeaturedStory(models.Model):
         verbose_name_plural = "featured stories"
 
 
+class StoryAuthorFieldPanel(FieldPanel):
+    def on_form_bound(self):
+        choices = self.model.get_user_field_choices(self.model)
+        self.form.fields[self.field_name].queryset = choices
+        self.form.fields[self.field_name].empty_label = ANONYMOUS_AUTHOR_NAME
+        super().on_form_bound()
+
+
 class StoryPage(Page):
     MAX_RELATED_STORIES = 10
 
@@ -128,10 +139,28 @@ class StoryPage(Page):
         'news.StoryIndexPage'
     ]
 
+    anonymous = models.BooleanField(
+        default=False, 
+        help_text="When checked, story author will be XR Boston"
+    )
+    author = models.ForeignKey(
+        'common.User', 
+        null=True, 
+        blank=True, 
+        on_delete=models.SET_NULL, 
+        related_name="+"
+    )
     date = models.DateField("post date")
-    lede = models.CharField(max_length=1024)
+    lede = models.CharField(
+        max_length=1024, 
+        help_text="A short intro that appears in the story index page"
+    )
     tags = ClusterTaggableManager(through=StoryTag, blank=True)
-    categories = ParentalManyToManyField('news.StoryCategory', blank=True)
+    categories = ParentalManyToManyField(
+        'news.StoryCategory', 
+        blank=True, 
+        help_text="The set of categories this page will be served"
+    )
 
     # Add allowed block types to StreamPanel
     content = StreamField(
@@ -177,9 +206,6 @@ class StoryPage(Page):
 
         return context
 
-    def author(self):
-        return self.owner.username
-
     def hero_image(self):
         gallery_item = self.gallery_images.first()
         if gallery_item:
@@ -198,7 +224,18 @@ class StoryPage(Page):
         if hero_image:
             return hero_image.url
         return self.media_thumbnail_url()
+
+    def author_name(self):
+        if self.anonymous:
+            return ANONYMOUS_AUTHOR_NAME
+        elif self.author:
+            return self.author.username
+        else:
+            return self.owner.username
         
+    def get_user_field_choices(self):
+        return User.objects.with_perm('wagtaildocs.add_document')
+
     search_fields = Page.search_fields = [
         index.SearchField('lede'),
         index.SearchField('body'),
@@ -206,6 +243,8 @@ class StoryPage(Page):
 
     content_panels = Page.content_panels + [
         MultiFieldPanel([
+            FieldPanel('anonymous'),
+            StoryAuthorFieldPanel('author', widget=forms.Select),
             FieldPanel('date'),
             FieldPanel('tags'),
             FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
