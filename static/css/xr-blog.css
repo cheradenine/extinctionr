@@ -127,6 +127,11 @@ span.blog-btn a {
 	text-decoration: none !important;
 }
 
+span.blog-tag a:hover, span.blog-tag a:focus,
+span.blog-btn a:hover, span.blog-btn a:focus {
+	color: rgb(20, 170, 55) !important;
+}
+
 iframe.youtube {
 	width: 100%;
 }
