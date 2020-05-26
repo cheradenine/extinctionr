@@ -77,8 +77,18 @@ class StoryIndexPage(Page, Orderable):
         context = super().get_context(request)
         
         stories = StoryPage.objects.live() #child_of(self).live()
-        stories = stories.order_by('-first_published_at')
+        stories = stories.order_by('-date')
         stories = stories.filter(categories__in=list(self.categories.all())).distinct()
+        author = request.GET.get('author', '')
+        if author:
+            # A bit wonky, but if using author filter we serve all content types,
+            # not just the categories under this listing.
+            if author == ANONYMOUS_AUTHOR_NAME:
+                stories = stories.filter(author=None)
+            else:
+                stories = stories.filter(author__username=author)
+        else:
+            stories = stories.filter(categories__in=list(self.categories.all())).distinct()
         tag = request.GET.get('tag', '')
         if tag:
             stories = stories.filter(tags__name=tag)
@@ -91,7 +101,7 @@ class StoryIndexPage(Page, Orderable):
         except:
             stories = paginator.page(1)
 
-        featured = FeaturedStory.objects.all().order_by('-story__first_published_at')
+        featured = FeaturedStory.objects.all().order_by('-story__date')
         context['stories'] = stories
         context['featured'] = featured
         context['peer_pages'] = self.get_siblings()
@@ -186,24 +196,22 @@ class StoryPage(Page):
         
         context = super().get_context(request)
         tags_list = list(self.tags.all())
-        stories = StoryPage.objects.live().order_by('-first_published_at')
+
         # Collects set of stories that has the same tags as this story.
-        related = stories.filter(tags__in=tags_list)
+        related = StoryPage.objects.live().order_by('-first_published_at')
+        related = related.filter(tags__in=tags_list)
         related = related.exclude(id=self.id)
-        related = related.distinct()[0:self.MAX_RELATED_STORIES]
         if related.count() > 0:
+            related = related.distinct()[0:self.MAX_RELATED_STORIES]
             context["related"] = related
 
-        # get next and previous by date. the names look swapped but this is intentional
-        # because posts are sorted in reverse chronological order
-
         try:
-            context['nextstory'] = self.get_previous_by_date(tags__in=tags_list)
+            context['prevstory'] = self.get_previous_by_date(tags__in=tags_list)
         except (StoryPage.DoesNotExist, ValueError):
             pass
 
         try:
-            context['prevstory'] = self.get_next_by_date(tags__in=tags_list)
+            context['nextstory'] = self.get_next_by_date(tags__in=tags_list)
         except (StoryPage.DoesNotExist, ValueError):
             pass
 
