@@ -44,11 +44,7 @@
             {% image page.hero_image fill-1280x720 class="hero-image mb-2"%}
             {% endif %}
             <h1 class="mb-1 blog-title">{{page.title}}</h1>
-            <div>
-                <small>
-                By <a href="/news/?author={{page.author_name}}">{{page.author_name}}</a> | {{page.date}}
-                </small>
-            </div>
+            <div class="blog-byline">By <a href="/news/?author={{page.author_name}}" class="blog-link">{{page.author_name}}</a> | {{page.date}}</div>
             <div class="mt-2">
             {% for tag in page.tags.all %}
               <span class="blog-tag ml-0 mr-2 my-1"><a href="{% pageurl page.get_parent %}?tag={{tag}}">{{tag}}</a></span>

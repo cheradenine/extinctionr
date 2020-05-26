@@ -124,9 +124,16 @@ class FeaturedStory(models.Model):
 
 class StoryAuthorFieldPanel(FieldPanel):
     def on_form_bound(self):
-        choices = self.model.get_user_field_choices(self.model)
-        self.form.fields[self.field_name].queryset = choices
-        self.form.fields[self.field_name].empty_label = ANONYMOUS_AUTHOR_NAME
+        def label_from_instance(self, obj):
+            return obj.username
+
+        author_field = self.form.fields[self.field_name]
+        author_field.queryset = User.objects.with_perm('wagtaildocs.add_document')
+        author_field.empty_label = ANONYMOUS_AUTHOR_NAME
+        author_field.initial = self.model.owner
+        # We can't get the wagtail panel to instantiate a derived ModelChoiceField
+        # so we patch it to override the choice label.
+        author_field.label_from_instance = label_from_instance.__get__(author_field)
         super().on_form_bound()
 
 
@@ -139,10 +146,6 @@ class StoryPage(Page):
         'news.StoryIndexPage'
     ]
 
-    anonymous = models.BooleanField(
-        default=False, 
-        help_text="When checked, story author will be XR Boston"
-    )
     author = models.ForeignKey(
         'common.User', 
         null=True, 
@@ -226,16 +229,11 @@ class StoryPage(Page):
         return self.media_thumbnail_url()
 
     def author_name(self):
-        if self.anonymous:
+        if not self.author:
             return ANONYMOUS_AUTHOR_NAME
-        elif self.author:
-            return self.author.username
         else:
             return self.owner.username
         
-    def get_user_field_choices(self):
-        return User.objects.with_perm('wagtaildocs.add_document')
-
     search_fields = Page.search_fields = [
         index.SearchField('lede'),
         index.SearchField('body'),
@@ -243,7 +241,6 @@ class StoryPage(Page):
 
     content_panels = Page.content_panels + [
         MultiFieldPanel([
-            FieldPanel('anonymous'),
             StoryAuthorFieldPanel('author', widget=forms.Select),
             FieldPanel('date'),
             FieldPanel('tags'),
