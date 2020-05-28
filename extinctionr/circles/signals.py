@@ -7,7 +7,7 @@ from crum import get_current_user
 
 from .models import (
     Circle, CircleMember, MembershipRequest, 
-    CircleJob, Signup, Contact
+    CircleJob, Contact
 )
 from . import comm, git, get_circle
 from .anapi import add_to_action_networks
@@ -37,13 +37,6 @@ def save_to_git(sender, instance, **kwargs):
 def notify_job(sender, instance, **kwargs):
     if instance.filled:
         comm.notify_circle_job(instance)
-
-
-@receiver(post_save, sender=Signup)
-def send_signup_email(sender, instance, **kwargs):
-    outreach_circle = get_circle('outreach')
-    if outreach_circle:
-        comm.notify_new_signup(outreach_circle, instance)
 
 
 @receiver(post_save, sender=Contact)

@@ -24,7 +24,6 @@ from wagtail.core import urls as wagtail_urls
 
 # from django.contrib.auth import views
 from extinctionr.actions.views import propose_talk
-from extinctionr.circles.views import SignupView
 
 from common.views import handler404, handler500
 

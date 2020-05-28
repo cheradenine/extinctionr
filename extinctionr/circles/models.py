@@ -286,27 +286,6 @@ class Couch(models.Model):
         return get_contact(user.email) == self.owner
 
 
-class Signup(models.Model):
-    created = models.DateTimeField(db_index=True, auto_now_add=True)
-    contact = models.ForeignKey(Contact, null=True, blank=True, on_delete=models.SET_NULL)
-    ip_address = models.CharField(max_length=255, blank=True, default='')
-    raw_data = models.TextField(blank=True, default='{}')
-
-    json_fields = ('email', 'first_name', 'last_name', 'phone', 'zipcode', 'interests', 'other_groups', 'committment', 'working_group', 'anything_else')
-
-    @property
-    def data(self):
-        return json.loads(self.raw_data)
-
-    @data.setter
-    def data(self, obj):
-        self.raw_data = json.dumps(obj)
-
-
-    for key in json_fields:
-        exec ('def {0}(self):\n    return self.data.get("{0}", None)'.format(key))
-
-
 class TaggedVolunteerRequest(TaggedItemBase):
     content_object = models.ForeignKey('VolunteerRequest', on_delete=models.CASCADE)
 
