@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
 {% load info %}
 {% block title %}:: {{action.text_title}}{% endblock %}
 {% block og_title %}{{action.text_title}}{% endblock %}
@@ -98,7 +99,11 @@ not working yet because we need actual address data for events.
 		</div>
 	</div>
 </div>
-{% if photos %}
+{% if image %}
+	<div class="col text-center">
+		{% image image fill-1024x576 class="img img-fluid"%}
+	</div>
+{% elif photos %}
 {% load thumbnail %}
 <section class="row photo-view py-sm-4 py-md-5 px justify-content-center">
 	{% for photo in photos %}

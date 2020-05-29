@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
 {% load actions %}
 {% load static %}
 {% block title %}:: Upcoming Actions{% endblock %}
@@ -169,9 +170,13 @@ table a:hover {
             <div class="text-left small">{{action.description|markdownify|truncatewords_html:30}}</div>
         </div>
         <div class="col-lg-4">
+            {% if action.image %}
+            {% image action.image fill-800x450 class="w-100 action-img"%}
+            {% else %}
             <div style="--aspect-ratio:16/9;">
                 <img src="{{action.card_thumbnail_url|default:'/static/images/xr-mass.png'}}" class="w-100 action-img" alt="Event Image">
             </div>
+            {% endif %}
         </div>
     </div>
     <hr>
