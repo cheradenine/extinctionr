@@ -1,5 +1,3 @@
-import datetime
-from hashlib import md5
 from urllib.parse import quote
 
 from django.db import models
@@ -9,15 +7,10 @@ from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.safestring import mark_safe
 from django.utils.html import linebreaks
-
-from modelcluster.fields import ParentalKey
-
 from wagtail.admin.edit_handlers import (
-    FieldPanel, InlinePanel, MultiFieldPanel, FieldRowPanel
+    FieldPanel, MultiFieldPanel, FieldRowPanel
 )
 from wagtail.images.edit_handlers import ImageChooserPanel
-from wagtail.core.models import Orderable
-
 
 from markdownx.models import MarkdownxField
 from markdown import markdown
@@ -31,6 +24,7 @@ from extinctionr.utils import get_contact
 
 USER_MODEL = get_user_model()
 
+
 class ActionManager(models.Manager):
     def for_user(self, user):
         qset = self.all().order_by('when')
@@ -39,6 +33,7 @@ class ActionManager(models.Manager):
         if not user.is_staff:
             qset = qset.exclude(tags__name='pending')
         return qset
+
 
 class Action(models.Model):
     name = models.CharField(max_length=255, db_index=True)
@@ -90,7 +85,7 @@ class Action(models.Model):
             role = role.strip()
             if role:
                 yield role
-    
+
     def is_full(self):
         return self.max_participants and self.attendee_set.count() >= self.max_participants
 
@@ -138,7 +133,7 @@ class Action(models.Model):
         else:
             link = '<a href="https://maps.google.com/?q={}">{}</a>'.format(quote(self.location), linebreaks(self.location))
         return mark_safe(link)
-    
+
     @property
     def card_thumbnail_url(self):
         if self.photos:
