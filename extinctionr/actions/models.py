@@ -12,7 +12,9 @@ from wagtail.admin.edit_handlers import (
 )
 from wagtail.images.edit_handlers import ImageChooserPanel
 
-from markdownx.models import MarkdownxField
+from wagtailmarkdown.fields import MarkdownField
+from wagtailmarkdown.edit_handlers import MarkdownPanel
+
 from markdown import markdown
 from taggit.managers import TaggableManager
 
@@ -20,6 +22,7 @@ from contacts.models import Contact
 
 from extinctionr.info.models import Photo
 from extinctionr.utils import get_contact
+from extinctionr.vaquita.widgets import ZOrderMarkdownTextarea
 
 
 USER_MODEL = get_user_model()
@@ -38,7 +41,7 @@ class ActionManager(models.Manager):
 class Action(models.Model):
     name = models.CharField(max_length=255, db_index=True)
     when = models.DateTimeField(db_index=True)
-    description = MarkdownxField(default='', blank=True, help_text='Markdown formatted')
+    description = MarkdownField(default='', blank=True, help_text='Markdown formatted')
     slug = models.SlugField(unique=True, help_text='Short form of the title, for URLs')
     public = models.BooleanField(default=True, blank=True, help_text='Whether this action should be listed publicly')
     location = models.TextField(default='', blank=True, help_text='Event location will be converted to a google maps link, unless you format it as a Markdown link -- [something](http://foo.com)')
@@ -68,7 +71,7 @@ class Action(models.Model):
             FieldPanel('location'),
             FieldPanel('slug'),
         ]),
-        FieldPanel('description'),
+        MarkdownPanel('description', widget=ZOrderMarkdownTextarea),
         ImageChooserPanel('image'),
         FieldPanel('tags'),
         FieldRowPanel([
@@ -111,7 +114,7 @@ class Action(models.Model):
 
     @property
     def html_title(self):
-        return mark_safe(self.name.replace('\n','<br>').replace('\\n', '<br>'))
+        return mark_safe(self.name.replace('\n', '<br>').replace('\\n', '<br>'))
 
     @property
     def text_title(self):

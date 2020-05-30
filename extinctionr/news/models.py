@@ -1,5 +1,7 @@
 from django import forms
-from django.core.paginator import Paginator
+from django.core.paginator import (
+    Paginator, InvalidPage, PageNotAnInteger
+)
 from django.db import models
 
 from modelcluster.contrib.taggit import ClusterTaggableManager
@@ -7,7 +9,7 @@ from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from taggit.models import TaggedItemBase
 
 from wagtail.admin.edit_handlers import (
-    FieldPanel, InlinePanel, MultiFieldPanel, StreamFieldPanel, 
+    FieldPanel, InlinePanel, MultiFieldPanel, StreamFieldPanel,
     PageChooserPanel
 )
 from wagtail.core.blocks import (
@@ -23,7 +25,7 @@ from wagtail.snippets.models import register_snippet
 from wagtailmarkdown.blocks import MarkdownBlock
 
 from common.models import User
-from extinctionr.vaquita.blocks import ImageCarouselBlock
+from extinctionr.vaquita.blocks import ImageCarouselBlock, ZOrderMarkdownBlock
 from .blocks import EmbedContentBlock
 
 # Display name used when story is tagged as anonymous
@@ -99,7 +101,7 @@ class StoryIndexPage(Page, Orderable):
         page = request.GET.get("page")
         try:
             stories = paginator.page(page)
-        except:
+        except (InvalidPage, PageNotAnInteger):
             stories = paginator.page(1)
 
         featured = FeaturedStory.objects.all().order_by('-story__date')
@@ -115,7 +117,7 @@ class FeaturedStory(models.Model):
     """ A featured story holds a reference to the story and can be set
     in the snippets editor"""
     story = models.ForeignKey(
-        "wagtailcore.Page", 
+        "wagtailcore.Page",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -158,7 +160,7 @@ class StoryPage(Page):
     ]
 
     author = models.ForeignKey(
-        'common.User', 
+        'common.User',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -166,7 +168,7 @@ class StoryPage(Page):
     )
     date = models.DateField("post date")
     lede = models.CharField(
-        max_length=1024, 
+        max_length=1024,
         help_text="A short intro that appears in the story index page"
     )
     tags = ClusterTaggableManager(through=StoryTag, blank=True)
@@ -182,7 +184,7 @@ class StoryPage(Page):
             ('paragraph', RichTextBlock(features=[
                 'h2', 'h3', 'bold', 'italic', 'link', 'ol', 'ul'
             ])),
-            ('markdown', MarkdownBlock(icon='code')),
+            ('markdown', ZOrderMarkdownBlock(icon='code')),
             ('image', StructBlock([
                 ('image', ImageChooserBlock()),
                 ('caption', CharBlock(required=False))

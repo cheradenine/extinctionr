@@ -1,7 +1,7 @@
 from django.contrib.admin.utils import quote
 
 from wagtail.contrib.modeladmin.options import (
-    ModelAdmin,    
+    ModelAdmin,
     modeladmin_register
 )
 from wagtail.contrib.modeladmin.helpers import ButtonHelper
@@ -27,11 +27,12 @@ class ActionButtonHelper(ButtonHelper):
     def get_buttons_for_obj(self, obj, exclude=None, classnames_add=None, classnames_exclude=None):
         btns = super().get_buttons_for_obj(obj, exclude, classnames_add, classnames_exclude)
         if 'view' not in (exclude or []):
-            # Find the edit button:
+            # Find the edit button.
             for i, btn in enumerate(btns):
                 if btn['label'] == 'Edit':
                     break
-            btns.insert(i+1, self.view_button(obj))
+            # Insert after edit button.
+            btns.insert(i + 1, self.view_button(obj))
         return btns
 
 
