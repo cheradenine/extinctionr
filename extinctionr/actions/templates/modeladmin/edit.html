@@ -1,8 +1,6 @@
 {% extends "modeladmin/create.html" %}
 {% load i18n %}
 
-{% block form_action %}{{ view.edit_url }}{% endblock %}
-
 {% block form_actions %}
     <div class="dropdown dropup dropdown-button match-width">
         <button type="submit" class="button action-save button-longrunning" data-clicked-text="{% trans 'Saving…' %}">
@@ -11,12 +9,12 @@
             <div class="dropdown-toggle icon icon-arrow-up"></div>
             <ul>
                 {% if user_can_delete %}
-                <li><a href="{{ view.delete_url }}" class="shortcut">{% trans "Delete" %}</a></li>
+                    <li><a href="{{ view.delete_url }}" class="shortcut">{% trans "Delete" %}</a></li>
                 {% endif %}
                 <li>
-                <input type="submit" class="button action-save button-longrunning" data-clicked-text="{% trans 'Saving…' %}" value="Save and continue editing" name="_continue">
-                    <span class="icon icon-spinner"></span><em>{% trans 'Save and continue editing' %}</em>
-                </input>
+                    <input type="submit" class="button action-save button-longrunning" data-clicked-text="{% trans 'Saving…' %}" value="Save and continue editing" name="_continue">
+                        <span class="icon icon-spinner"></span><em>{% trans 'Save and continue editing' %}</em>
+                    </input>
                 </li>
             </ul>
     </div>
