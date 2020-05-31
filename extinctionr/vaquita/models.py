@@ -5,6 +5,7 @@ from django.db import models
 
 from wagtail.images.models import Image, AbstractImage, AbstractRendition
 
+
 def _filepath_with_date(filepath):
     path = PurePath(filepath)
     today = date.today()
