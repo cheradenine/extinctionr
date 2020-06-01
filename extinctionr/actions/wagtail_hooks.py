@@ -39,13 +39,12 @@ class ActionButtonHelper(ButtonHelper):
 # Mixin that enables save and continue editing.
 class SaveAndContinue:
     def get_edit_url(self):
-        return self.url_helper.get_action_url('edit', quote(self.instance.pk))
+        return self.url_helper.get_action_url('edit', quote(self._instance.pk))
 
     def form_valid(self, form):
-        res = super().form_valid(form)
-        # Had to override this just to save the model instance.
-        self.instance = form.instance
-        return res
+        # Have to save instance this form is working with:
+        self._instance = form.instance
+        return super().form_valid(form)
 
     def get_success_message_buttons(self, instance):
         if self._is_continue():
@@ -56,7 +55,6 @@ class SaveAndContinue:
         # Enables 'save and continue' mode of editing.
         if self._is_continue():
             return self.get_edit_url()
-
         return super().get_success_url()
 
     def _is_continue(self):
@@ -96,9 +94,11 @@ class ActionAdmin(ModelAdmin):
         ''' Tricks the editor into enabling some javascript normally
             used on Page models to sync the title with the slug
         '''
-        form = view.context_data['form']
-        form.fields['name'].widget.attrs['id'] = 'id_title'
-        form.fields['slug'].widget.attrs['id'] = 'id_slug'
+        context_data = getattr(view, 'context_data', None)
+        if context_data:
+            form = context_data['form']
+            form.fields['name'].widget.attrs['id'] = 'id_title'
+            form.fields['slug'].widget.attrs['id'] = 'id_slug'
 
 
 modeladmin_register(ActionAdmin)
