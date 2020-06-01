@@ -22,8 +22,6 @@ from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
-from wagtailmarkdown.blocks import MarkdownBlock
-
 from common.models import User
 from extinctionr.vaquita.blocks import ImageCarouselBlock, ZOrderMarkdownBlock
 from .blocks import EmbedContentBlock
