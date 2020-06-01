@@ -46,16 +46,14 @@
             <h1 class="mb-1 blog-title">{{page.title}}</h1>
             <div class="blog-byline">By <a href="/news/?author={{page.author_name}}" class="blog-link">{{page.author_name}}</a> | {{page.date}}</div>
             <div class="mt-2">
-            {% for tag in page.tags.all %}
-              <span class="blog-tag ml-0 mr-2 my-1"><a href="{% pageurl page.get_parent %}?tag={{tag}}">{{tag}}</a></span>
-            {% endfor %}
-            </div>
-
-            <hr class="thick">
-            <div>
             <!-- consider a separate grid here with rows for each block -->
             {% for block in page.content %}
               {% include_block block %}
+            {% endfor %}
+            </div>
+            <div class="mt-2 mb-3">
+            {% for tag in page.tags.all %}
+              <span class="blog-tag ml-0 mr-2 my-1"><a href="{% pageurl page.get_parent %}?tag={{tag}}">{{tag}}</a></span>
             {% endfor %}
             </div>
         </div>
