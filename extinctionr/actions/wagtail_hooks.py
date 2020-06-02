@@ -1,10 +1,11 @@
 from django.contrib.admin.utils import quote
 
+from wagtail.contrib.modeladmin.helpers import ButtonHelper
+from wagtail.contrib.modeladmin.mixins import ThumbnailMixin
 from wagtail.contrib.modeladmin.options import (
     ModelAdmin,
     modeladmin_register
 )
-from wagtail.contrib.modeladmin.helpers import ButtonHelper
 from wagtail.contrib.modeladmin.views import EditView, CreateView
 
 from .models import Action
@@ -73,17 +74,20 @@ class ActionCreateView(SaveAndContinue, CreateView):
         return None
 
 
-class ActionAdmin(ModelAdmin):
+class ActionAdmin(ThumbnailMixin, ModelAdmin):
     model = Action
     button_helper_class = ActionButtonHelper
     edit_view_class = ActionEditView
     create_view_class = ActionCreateView
     menu_icon = 'date'
-    list_display = ('slug', 'name', 'when',)
+    list_display = ('name', 'slug', 'admin_thumb', 'when',)
     filter_vertical = ('photos',)
     readonly_fields = ('modified', )
     add_to_settings_menu = False
     exclude_from_explorer = False
+    thumb_image_field_name = 'image'
+    thumb_image_filter_spec = 'fill-112x63'
+    thumb_image_width = 112
 
     def create_view(self, request):
         view = super().create_view(request)
