@@ -1,11 +1,12 @@
-import urllib
 from django import template
 from django.utils.timezone import now
 
 from extinctionr.news.models import FeaturedStory
 from extinctionr.actions.models import Action
 
+from ..models import SpecialNotice
 register = template.Library()
+
 
 @register.filter('elide_pages')
 def elide_pages(range, cur_page):
@@ -15,10 +16,10 @@ def elide_pages(range, cur_page):
         if p <= 2 or p >= range.stop - 2:
             pages.append(p)
             skip = False
-        elif cur_page-3 <= p <= cur_page+3:
+        elif cur_page - 3 <= p <= cur_page + 3:
             pages.append(p)
             skip = False
-        elif not skip:        
+        elif not skip:
             pages.append(-1)
             skip = True
     return pages
@@ -29,9 +30,11 @@ def story_sidebar(*args, **kwargs):
     featured = FeaturedStory.objects.all().order_by('-story__first_published_at')
     return {'featured_stories': featured}
 
+
 @register.inclusion_tag("news/story_mini_card.html")
 def mini_card(story):
-    return {'story' : story.specific}
+    return {'story': story.specific}
+
 
 @register.inclusion_tag('news/upcoming_actions.html')
 def upcoming_actions(*args, **kwargs):
@@ -40,3 +43,15 @@ def upcoming_actions(*args, **kwargs):
     except IndexError:
         actions = None
     return {'actions': actions}
+
+
+@register.inclusion_tag("news/banner_message.html")
+def banner_message(*args, **kwargs):
+    # There is only one notice.
+    messages = SpecialNotice.objects.all()
+
+    # Avoids breakage on new installs when there is no message
+    if messages.count() == 0 or True:
+        return {'message': {'enabled': False}}
+
+    return {'message': messages[0]}

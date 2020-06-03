@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 from django import forms
 from django.core.paginator import (
     Paginator, InvalidPage, PageNotAnInteger
@@ -324,3 +325,6 @@ class SpecialNotice(BaseSetting):
 
     def __str__(self):
         return self.message
+
+    def url(self):
+        return urlparse(self.link).path

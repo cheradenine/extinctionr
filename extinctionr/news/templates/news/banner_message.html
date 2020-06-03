@@ -1,0 +1,14 @@
+{% if message.enabled %}
+<h4 class="speical-notice text-center p-1 my-0" 
+    style="background-color:{{message.background_color}}">
+	<span>
+        <a href="{{message.url}}" 
+           style="color:{{message.link_color}}"
+           onMouseOver="this.style.color='{{message.hover_color}}'"
+           onMouseOut="this.style.color='{{message.link_color}}'"
+           >
+            <u>{{message.message}}</u>
+        </a>
+    </span>
+</h4>
+{% endif %}

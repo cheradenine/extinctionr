@@ -67,9 +67,9 @@
 
 </head>
 <body>
-    {% load actions %}
+    {% load news %}
     {% block header %}
-    {% highlight_action %}
+    {% banner_message %}
 
     <nav id="site-nav" class="navbar navbar-expand-lg navbar-dark sticky-top">
       <a href="{% url 'extinctionr.info:index' %}"><img id="header-image" class="img img-responsive" height="80" data-swap="{% static 'images/xrmass-yellow-small.svg' %}" src="{% if page == 'home' %}{% static 'images/xrmass-green-small.svg' %}{% else %}{% static 'images/xrmass.svg' %}{% endif %}" alt="Extinction Rebellion"></a>
