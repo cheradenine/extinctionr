@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.contrib.modeladmin',
+    'wagtail.contrib.settings',
     'wagtail.embeds',
     'wagtail.sites',
     'wagtail.users',
@@ -138,9 +139,11 @@ if DEBUG:
         INSTALLED_APPS += ['debug_toolbar']
         MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
     except ImportError:
-        print('Debug toolbar not installed.')
         pass
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    INSTALLED_APPS += [
+        'wagtail.contrib.styleguide'
+    ]
 
 
 INTERNAL_IPS = ['127.0.0.1']
@@ -158,7 +161,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'sekizai.context_processors.sekizai', # for django-wiki
+                'sekizai.context_processors.sekizai',  # for django-wiki
                 'django_mailman3.context_processors.common',
                 'postorius.context_processors.postorius',
             ],
@@ -288,7 +291,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 WIKI_CHECK_SLUG_URL_AVAILABLE = False
 
-### django-todo settings
+# django-todo settings
 TODO_DEFAULT_LIST_SLUG = 'tickets'
 TODO_DEFAULT_ASSIGNEE = 'johnb.xr@pm.me'
 TODO_PUBLIC_SUBMIT_REDIRECT = 'extinctionr.info:index'
@@ -356,7 +359,7 @@ POSTORIUS_TEMPLATE_BASE_URL = "http://localhost:8000"
 ADMINS = [('Webmaster', 'webmaster@xrmass.org')]
 SERVER_EMAIL = 'webmaster@xrmass.org'
 
-### Wagtail settings
+# Wagtail settings
 WAGTAIL_SITE_NAME = 'XR Boston'
 WAGTAILEMBEDS_RESPONSIVE_HTML = True
 WAGTAILIMAGES_IMAGE_MODEL = 'vaquita.CustomImage'

@@ -1,0 +1,37 @@
+<div class="dropdown dropdown-button match-width white">
+    <div class="button button-secondary">
+        {{ widget.name }}
+    </div>
+    <div class="dropdown-toggle icon icon-arrow-down"></div>
+    <ul>
+        <li>
+            <div class="xr-color-picker">
+                <div class="col">
+                    <div class="cell xr-bg-green"></div>
+                    <div class="cell xr-bg-lemon"></div>
+                    <div class="cell xr-bg-light-blue"></div>
+                    <div class="cell xr-bg-light-gray"></div>
+                </div>
+                <div class="col">
+                    <div class="cell xr-bg-pink"></div>
+                    <div class="cell xr-bg-purple"></div>
+                    <div class="cell xr-bg-light-green"></div>
+                    <div class="cell xr-bg-med-gray"></div>
+                </div>
+                <div class="col">
+                    <div class="cell xr-bg-dark-blue"></div>
+                    <div class="cell xr-bg-angry"></div>
+                    <div class="cell xr-bg-red"></div>
+                    <div class="cell xr-bg-dark-gray"></div>
+                </div>
+                <div class="col">
+                    <div class="cell xr-bg-warm-yellow"></div>
+                    <div class="cell xr-bg-bright-pink"></div>
+                    <div class="cell xr-bg-white"></div>
+                    <div class="cell xr-bg-black"></div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+{% include "django/forms/widgets/input.html" %}

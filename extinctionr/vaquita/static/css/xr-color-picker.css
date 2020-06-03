@@ -1,0 +1,129 @@
+.xr-green {
+    color: rgb(20, 170, 55);
+}
+
+.xr-bg-green {
+    background-color: rgb(20, 170, 55) !important;
+}
+
+.xr-lemon {
+    color: rgb(247, 238, 106);
+}
+
+.xr-bg-lemon {
+    background-color: rgb(247, 238, 106) !important;
+}
+
+.xr-light-blue {
+    color: rgb(117, 208, 241);
+}
+
+.xr-bg-light-blue {
+    background-color: rgb(117, 208, 241) !important;
+}
+
+.xr-pink {
+    color: rgb(237, 155,196);
+}
+
+.xr-bg-pink {
+    background-color: rgb(237, 155,196) !important;
+}
+
+.xr-purple {
+    color: rgb(152, 98, 151);
+}
+
+.xr-bg-purple {
+    background-color: rgb(152, 98, 151) !important;
+}
+
+.xr-light-green {
+    color: rgb(190, 210, 118);
+}
+
+.xr-bg-light-green {
+    background-color: rgb(190, 210, 118) !important;
+}
+
+.xr-warm-yellow {
+    color: rgb(255, 193, 30);
+}
+
+.xr-bg-warm-yellow {
+    background-color: rgb(255, 193, 30) !important;
+}
+
+.xr-bright-pink {
+    color: rgb(207, 98, 151);
+}
+
+.xr-bg-bright-pink {
+    background-color: rgb(207, 98, 151) !important;
+}
+
+.xr-red {
+    color: rgb(220, 79, 0);
+}
+
+.xr-bg-red {
+    background-color: rgb(220, 79, 0) !important;
+}
+
+.xr-dark-blue {
+    color: rgb(56, 96, 170);
+}
+
+.xr-bg-dark-blue {
+    background-color: rgb(56, 96, 170) !important;
+}
+
+.xr-angry {
+    color: rgb(200, 0, 130);
+}
+
+.xr-bg-angry {
+    background-color: rgb(200, 0, 130);
+}
+
+.xr-bg-black {
+    background-color: rgb(0,0,0) !important;
+}
+
+.xr-bg-dark-gray {
+    background-color: rgb(64,64,64) !important;
+}
+
+.xr-bg-med-gray {
+    background-color: rgb(128,128,128) !important;
+}
+
+.xr-bg-light-gray {
+    background-color: rgb(196,196,196) !important;
+}
+
+.xr-bg-white {
+    background-color: rgb(255,255,255) !important;
+}
+
+.xr-color-picker {
+    display: flex;
+}
+
+.xr-color-picker > .col {
+    width: 33%;
+}
+
+.xr-color-picker .cell {
+    height: 20px;
+    padding: 10px;
+    font-weight: 800;
+}
+
+.xr-no-labels label {
+    display: none !important;
+}
+
+.xr-no-labels .field-content {
+    width: 100% !important;
+}

@@ -10,8 +10,9 @@ from taggit.models import TaggedItemBase
 
 from wagtail.admin.edit_handlers import (
     FieldPanel, InlinePanel, MultiFieldPanel, StreamFieldPanel,
-    PageChooserPanel
+    PageChooserPanel, FieldRowPanel
 )
+from wagtail.contrib.settings.models import BaseSetting, register_setting
 from wagtail.core.blocks import (
     RichTextBlock, BlockQuoteBlock, CharBlock, StructBlock
 )
@@ -24,6 +25,7 @@ from wagtail.snippets.models import register_snippet
 
 from common.models import User
 from extinctionr.vaquita.blocks import ImageCarouselBlock, ZOrderMarkdownBlock
+from extinctionr.vaquita.widgets import XRColorPicker
 from .blocks import EmbedContentBlock
 
 # Display name used when story is tagged as anonymous
@@ -277,3 +279,48 @@ class StoryPageGalleryImage(Orderable):
         ImageChooserPanel('image'),
         FieldPanel('caption')
     ]
+
+
+@register_setting
+class SpecialNotice(BaseSetting):
+    class Meta:
+        verbose_name = 'Special banner message'
+
+    message = models.CharField(
+        max_length=255,
+        help_text='Message will appear at the top of every page'
+    )
+    link = models.URLField(
+        help_text='The url to the page the message should link to'
+    )
+    background_color = models.CharField(
+        max_length=7,
+        verbose_name='background',
+    )
+    link_color = models.CharField(
+        max_length=7,
+        verbose_name='',
+    )
+    hover_color = models.CharField(
+        max_length=7,
+        verbose_name='',
+    )
+    enabled = models.BooleanField(
+        default=False,
+        help_text='Turn off the special banner message'
+    )
+    panels = [
+        FieldPanel('message'),
+        FieldPanel('link'),
+        MultiFieldPanel([
+            FieldRowPanel([
+                FieldPanel('background_color', widget=XRColorPicker),
+                FieldPanel('link_color', widget=XRColorPicker),
+                FieldPanel('hover_color', widget=XRColorPicker),
+            ], classname="xr-no-labels"),
+        ], heading="Colors"),
+        FieldPanel('enabled'),
+    ]
+
+    def __str__(self):
+        return self.message
