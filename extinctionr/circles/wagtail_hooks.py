@@ -1,9 +1,9 @@
 from django.contrib import admin
 
 from wagtail.contrib.modeladmin.options import (
-    ModelAdmin,     
-    ModelAdminGroup, 
-    modeladmin_register 
+    ModelAdmin,
+    ModelAdminGroup,
+    modeladmin_register
 )
 from wagtail.contrib.modeladmin.views import IndexView
 from contacts.models import Contact
@@ -41,7 +41,13 @@ class ContactAdmin(ModelAdmin):
         'state',
         'zipcode'
     )
-    search_fields = ('email', 'first_name', 'last_name', 'phone', 'postcode')
+    search_fields = (
+        'email',
+        'first_name',
+        'last_name',
+        'address__city',
+        'address__postcode',
+    )
 
     def city(self, obj):
         if not obj.address:
@@ -53,7 +59,7 @@ class ContactAdmin(ModelAdmin):
         if not obj.address:
             return self.empty_value_display
         return obj.address.state
-    
+
     def zipcode(self, obj):
         if not obj.address:
             return self.empty_value_display
@@ -75,9 +81,29 @@ class VolunteerRequestAdmin(ModelAdmin):
     menu_icon = "user"
     add_to_settings_menu = False
     exclude_from_explorer = False
-    readonly_fields = ('created', 'contact', 'message')
-    list_display = ('contact', 'contact_email', 'contact_phone', 'contact_city', 'created')
-    list_filter = (('tags', admin.RelatedOnlyFieldListFilter), 'contact__address__city')
+    #  TODO: readonly_fields apparently doesn't work.
+    readonly_fields = (
+        'created',
+        'contact',
+        'message',
+        'tags',
+        'updated',
+    )
+    list_display = (
+        'contact',
+        'contact_email',
+        'contact_phone',
+        'contact_city',
+        'created',
+        'status',
+        'updated',
+        'assigned',
+    )
+    list_filter = (
+        'status',
+        ('tags', admin.RelatedOnlyFieldListFilter),
+        'contact__address__city',
+    )
     list_export = (
         'created',
         'contact',
@@ -85,6 +111,8 @@ class VolunteerRequestAdmin(ModelAdmin):
         'contact_phone',
         'contact_city',
         'message',
+        'replied_on',
+        'assigned',
     )
 
     search_fields = ('contact__email', 'contact__address__city',)
@@ -97,11 +125,11 @@ class VolunteerRequestAdmin(ModelAdmin):
     def contact_phone(self, obj):
         return obj.contact.phone
 
-    contact_email.short_description = 'phone'
+    contact_phone.short_description = 'phone'
 
     def contact_city(self, obj):
         return obj.contact.address.city
-    
+
     contact_city.short_description = 'city'
 
 

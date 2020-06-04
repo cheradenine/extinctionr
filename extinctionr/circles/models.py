@@ -1,11 +1,12 @@
 from collections import defaultdict
-import json
 
 from django.core.exceptions import MultipleObjectsReturned
 from django.db import models
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.functional import cached_property
+
+from djchoices import DjangoChoices, ChoiceItem
 from markdownx.models import MarkdownxField
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
@@ -130,7 +131,7 @@ class Circle(models.Model):
     @property
     def has_children(self):
         return self.circle_set.exists()
-    
+
     @cached_property
     def public_email(self):
         email = self.email
@@ -203,7 +204,6 @@ class Circle(models.Model):
         return False
 
 
-
 class CircleMember(models.Model):
     circle = models.ForeignKey(Circle, on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
@@ -222,7 +222,6 @@ class CircleMember(models.Model):
 
     def get_absolute_url(self):
         return self.circle.get_absolute_url()
-
 
 
 class MembershipRequest(models.Model):
@@ -290,9 +289,33 @@ class TaggedVolunteerRequest(TaggedItemBase):
     content_object = models.ForeignKey('VolunteerRequest', on_delete=models.CASCADE)
 
 
+class VolunteerStatus(DjangoChoices):
+    init = ChoiceItem('n', label='New')
+    contacted = ChoiceItem('c', 'Contacted')
+    replied = ChoiceItem('r', 'Replied')
+    call_scheduled = ChoiceItem('s', "Scheduled")
+    called = ChoiceItem('l', 'Called')
+    joined = ChoiceItem('j', 'Joined')
+
+
 class VolunteerRequest(models.Model):
     created = models.DateTimeField(db_index=True, auto_now_add=True)
     contact = models.ForeignKey(Contact, null=True, blank=True, on_delete=models.SET_NULL)
     tags = TaggableManager(through=TaggedVolunteerRequest)
     message = models.TextField(blank=True, default='')
+    status = models.CharField(
+        max_length=1,
+        choices=VolunteerStatus.choices,
+        default=VolunteerStatus.init
+    )
+    updated = models.DateTimeField(blank=True, null=True, auto_now=True)
+    assigned = models.ForeignKey(
+        Contact,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='assignee'
+    )
 
+    def __str__(self):
+        return str(self.contact)
