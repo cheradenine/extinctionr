@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-app_name = 'circles' 
+app_name = 'circles'
 
 job_view = views.JobView.as_view()
 person_view = views.PersonView.as_view()
@@ -13,5 +13,4 @@ urlpatterns = [
     path('person/export/', views.csv_export, name='person-export'),
     path('person/autocomplete/', views.ContactAutocomplete.as_view(), name='person-autocomplete'),
     path('person/find/', views.FindFormView.as_view(), name='find-person'),
-    path('person/volunteer/export', views.volunteer_export, name='export-volunteer'),
 ]

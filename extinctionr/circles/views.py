@@ -2,24 +2,20 @@ from io import TextIOWrapper
 import csv
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.generic.edit import FormView
 from django.utils.timezone import now
 from django.contrib import messages
-from django.http import HttpResponseForbidden, HttpResponse, HttpResponseRedirect
-from django import forms
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 
 from extinctionr.utils import get_contact, get_last_contact, set_last_contact
-from .models import Circle, Contact, CircleJob, Couch, LEAD_ROLES, VolunteerRequest
-from . import get_circle
+from .models import Circle, Contact, CircleJob, Couch, LEAD_ROLES
 from .forms import (
-    FindPeopleForm, MembershipRequestForm, ContactForm, 
-    CouchForm, ContactAutocomplete, IntakeForm,
-    VOLUNTEER_SKILL_CHOICES)
+    FindPeopleForm, MembershipRequestForm, ContactForm,
+    CouchForm, ContactAutocomplete)
 
 
 @login_required
@@ -45,6 +41,7 @@ def del_member(request, pk):
         role = request.POST.get('role', 'member')
         circle.remove_member(contact, role=role, who=request.user)
     return redirect(circle.get_absolute_url())
+
 
 @login_required
 def approve_membership(request, pk):
@@ -108,12 +105,13 @@ def csv_import(request):
             tag_field = None
 
         contacts = set()
-        memberships = []
         for row in reader:
-            contact = get_contact(row[email_field],
+            contact = get_contact(
+                row[email_field],
                 first_name=row[first_name_field],
                 last_name=row[last_name_field],
-                phone=row[phone_field] if phone_field else None)
+                phone=row[phone_field] if phone_field else None
+            )
             contacts.add(contact)
             messages.success(request, 'Found {}'.format(contact))
             if wg_field and row[wg_field]:
@@ -171,7 +169,7 @@ class PersonView(BaseCircleView, FormView):
             'leads': Circle.objects.filter(circlemember__contact=contact, circlemember__role__in=LEAD_ROLES).distinct(),
             'members': Circle.objects.filter(circlemember__contact=contact).exclude(circlemember__role__in=LEAD_ROLES),
             'is_me': contact == me,
-            }
+        }
         couches = contact.couch_set.all()
         if not ctx['is_me']:
             couches = couches.filter(public=True)
@@ -198,6 +196,7 @@ class CouchListView(BaseCircleView, generic.ListView):
 
 class CircleView(BaseCircleView, generic.DetailView):
     template_name = 'circles/circle.html'
+
     def get_queryset(self):
         return Circle.objects.select_related('parent').prefetch_related('members')
 
@@ -272,7 +271,7 @@ class JobView(BaseCircleView, generic.TemplateView):
         if job_id:
             qset = qset.filter(pk=job_id)
             context['job_id'] = job_id
-        context['can_change'] = can_change = self.request.user.has_perm('circles.change_circlejob')
+        context['can_change'] = self.request.user.has_perm('circles.change_circlejob')
         context['jobs'] = qset
         return context
 
@@ -327,41 +326,3 @@ def csv_export(request):
             contact.address.city if contact.address else None,
             ','.join(contact.tags.names())))
     return resp
-
-
-@login_required
-def volunteer_export(request):
-    if request.user.has_perm('contacts.view_contact'):
-        resp = HttpResponse(content_type='text/csv')
-        resp['Content-Disposition'] = 'attachment; filename="volunteers.csv"'
-        csv_writer = csv.writer(resp)
-        header = [
-            'Created', 'Email', 'First Name', 'Last Name', 
-            'Phone', 'City', 'State', 'Zipcode', 
-            'Message'
-        ]
-        skill_tags = VOLUNTEER_SKILL_CHOICES
-        skill_header = [skill[1] for skill in VOLUNTEER_SKILL_CHOICES]
-        header = header + skill_header
-        csv_writer.writerow(header)
-        volunteers = VolunteerRequest.objects.all()
-        for volunteer in VolunteerRequest.objects.all():
-            contact = volunteer.contact
-            address = contact.address
-            # art, social, foo
-            # 'True', 'False', 'True', etc.
-            skills = set(volunteer.tags.names())
-            skill_data = [str(skill[0] in skills) for skill in skill_tags]
-
-            csv_writer.writerow((
-                volunteer.created.isoformat(),
-                contact.email,
-                contact.first_name,
-                contact.last_name,
-                contact.phone,
-                address.city if address else None,
-                address.state if address else None,
-                address.postcode if address else None,
-                volunteer.message,
-                *skill_data))
-        return resp
