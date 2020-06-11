@@ -1,6 +1,5 @@
 from datetime import datetime
 import bleach
-from hashlib import md5
 import jwt
 
 from django import forms
@@ -9,13 +8,12 @@ from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.core import serializers
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.loader import TemplateDoesNotExist, get_template
 from django.urls.exceptions import Resolver404
 from django.utils.decorators import method_decorator
 from django.utils.http import http_date
-from django.views.decorators.http import etag
 from django.views.decorators.cache import cache_page
 from django.views.generic import FormView, DetailView, ListView, TemplateView
 
@@ -97,7 +95,7 @@ class InfoView(TemplateView):
             page += 'index'
         try:
             template_name = 'pages/%s.html' % page
-            template = get_template(template_name).template
+            template = get_template(template_name).template  # noqa F841
             return template_name
         except TemplateDoesNotExist:
             return None
@@ -117,7 +115,7 @@ class InfoViewUrlPattern():
                 return match
         return None
 
-    # dynamically chain down to anything else to the wrapped pattern    
+    # dynamically chain down to anything else to the wrapped pattern
     def __getattr__(self, attr):
         if attr in self.__dict__:
             return getattr(self, attr)
@@ -146,6 +144,7 @@ class PRListView(ListView):
             resp['Cache-Control'] = 'private'
         return resp
 
+
 @method_decorator(cache_page(1200), name='dispatch')
 class PRDetailView(DetailView):
     def get_queryset(self):
@@ -163,9 +162,10 @@ class PRDetailView(DetailView):
             resp['Cache-Control'] = 'private'
         return resp
 
+
 def list_chapters(request):
     chapters = serializers.serialize("json", Chapter.objects.all())
-    context = {'chapters': chapters }
+    context = {'chapters': chapters}
     return render(request, 'pages/groups/index.html', context)
 
 
@@ -185,16 +185,16 @@ class SignupFormView(FormView):
         jwt_token = data['message']
         try:
             self.decode_token(jwt_token)
-        except:
+        except:  # noqa E722
             return HttpResponseRedirect('/')
 
-        postcode=data['zipcode']
+        postcode = data['zipcode']
         city, state = zipcode_lookup(postcode)
         person = get_contact(
             email=data['email'],
             first_name=data['first_name'],
             last_name=data['last_name'],
-            postcode=data['zipcode'],
+            postcode=postcode,
             city=city,
             state=state,
             phone=data['phone'])
@@ -229,10 +229,11 @@ class SignupFormView(FormView):
         """
         initial = super().get_initial()
         now = datetime.now().isoformat()
-        token = jwt.encode({'served':now}, settings.SECRET_KEY, algorithm='HS256')
+        token = jwt.encode({'served': now}, settings.SECRET_KEY, algorithm='HS256')
         # todo: would be cool to move this into the field at runtime
         # to further thwart the bots.
         initial['message'] = token.decode('UTF-8')
+        initial['email'] = self.request.GET.get('email', None)
         return initial
 
 

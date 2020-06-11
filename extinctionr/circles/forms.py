@@ -4,6 +4,7 @@ from taggit.models import Tag
 from extinctionr.actions.models import Action
 from .models import Contact
 
+
 class ContactForm(forms.Form):
     contact = forms.ModelChoiceField(
         required=False,
@@ -57,7 +58,7 @@ VOLUNTEER_SKILL_CHOICES = [
     ("action", "Action"),
     ("art", "Art"),
     ("music", "Music"),
-	("video", "Video"),
+    ("video", "Video"),
     ("finance", "Fundraising"),
     ("social", "Social Media"),
     ("comms", "Communications"),
@@ -69,34 +70,48 @@ VOLUNTEER_SKILL_CHOICES = [
     ("regen", "Regenerative Culture"),
 ]
 
+
 class IntakeForm(forms.Form):
     first_name = forms.CharField(
-        required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        required=True,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}
+        )
     )
     last_name = forms.CharField(
-        required=False, 
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional'})
+        required=False,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Optional'}
+        )
     )
     email = forms.EmailField(
-        label="Email", 
-        required=True, widget=forms.TextInput(attrs={'class': 'form-control'})
+        label="Email",
+        required=True,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}
+        )
     )
     phone = forms.CharField(
-        required=False, 
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional'})
+        required=False,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Optional'}
+        )
     )
     zipcode = forms.CharField(
-        required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        required=True,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}
+        )
     )
     volunteer = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(attrs={'data-toggle': 'collapse', 'data-target' : '#volunteer_form'})
+        widget=forms.CheckboxInput(
+            attrs={'data-toggle': 'collapse', 'data-target': '#volunteer_form'}
+        )
     )
     skills = forms.MultipleChoiceField(
         required=False,
-        choices=VOLUNTEER_SKILL_CHOICES, 
+        choices=VOLUNTEER_SKILL_CHOICES,
         widget=forms.CheckboxSelectMultiple()
     )
     skill_other = forms.BooleanField(
@@ -104,12 +119,16 @@ class IntakeForm(forms.Form):
     )
     skill_other_value = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control ', 'placeholder': 'Other'})
+        widget=forms.TextInput(
+            attrs={'class': 'form-control ', 'placeholder': 'Other'}
+        )
     )
     anything_else = forms.CharField(
-        required=False, 
+        required=False,
         max_length=255,
-        widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': '(Optional) anything else you want us to know?'})
+        widget=forms.Textarea(
+            attrs={'rows': 3, 'class': 'form-control', 'placeholder': '(Optional) anything else you want us to know?'}
+        )
     )
     message = forms.CharField(
         required=True,
@@ -123,6 +142,17 @@ class IntakeForm(forms.Form):
         return zipcode
 
 
+class SimpleSignupForm(forms.Form):
+    # Intention here is that filling this out brings user to
+    # full sign-up form with email already filled out.
+    email = forms.EmailField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Enter email address'}
+        )
+    )
+
+
 class ContactAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
@@ -134,4 +164,3 @@ class ContactAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(email__istartswith=self.q) | qs.filter(first_name__istartswith=self.q)
 
         return qs
-

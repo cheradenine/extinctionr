@@ -96,7 +96,17 @@
       {% block breadcrumb %}{% endblock %}
       {% block default_container %}{% block content %}{% endblock %}{% endblock %}
 </div> <!-- mainbody -->
-  <footer class="text-center mt-4 mx-0 px-0 pt-4 d-print-none" style="background-color: #1a1a1a;">
+  <footer class="text-center mt-4 mx-0 px-0 pt-2 xr-bg-dark-gray d-print-none">
+    <form class="mb-2" action="{% url 'extinctionr.info:join' %}" method="get">
+      <div class="form-row">
+        <div class="col-lg-3 offset-lg-4">
+            {{simple_signup_form.email}}
+        </div>
+        <div class="col-1 ml-1">
+            <input class="btn btn-success" type="submit" value="Join Us">
+        </div>
+      </div>
+    </form>
     <ul class="list-inline">
       <li class="list-inline-item">
         <a href="https://www.facebook.com/ExtRebMA/" target="_blank" class="social">
