@@ -18,7 +18,7 @@ from django.utils.http import http_date
 from django.views.decorators.cache import cache_page
 from django.views.generic import FormView, DetailView, ListView, TemplateView
 
-from extinctionr.circles.forms import IntakeForm, SimpleSignupForm
+from extinctionr.circles.forms import IntakeForm
 from extinctionr.circles.util import zipcode_lookup
 from extinctionr.circles.models import VolunteerRequest
 from extinctionr.utils import get_contact, get_last_contact, set_last_contact
