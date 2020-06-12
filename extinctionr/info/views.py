@@ -11,13 +11,14 @@ from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.loader import TemplateDoesNotExist, get_template
+from django.urls import reverse
 from django.urls.exceptions import Resolver404
 from django.utils.decorators import method_decorator
 from django.utils.http import http_date
 from django.views.decorators.cache import cache_page
 from django.views.generic import FormView, DetailView, ListView, TemplateView
 
-from extinctionr.circles.forms import IntakeForm
+from extinctionr.circles.forms import IntakeForm, SimpleSignupForm
 from extinctionr.circles.util import zipcode_lookup
 from extinctionr.circles.models import VolunteerRequest
 from extinctionr.utils import get_contact, get_last_contact, set_last_contact
@@ -221,7 +222,7 @@ class SignupFormView(FormView):
                 volunteer.tags.add(skill)
 
         set_last_contact(self.request, person)
-        return HttpResponseRedirect('/welcome/thankyou')
+        return HttpResponseRedirect(reverse('extinctionr.info:thankyou'))
 
     def get_initial(self):
         """
@@ -241,5 +242,5 @@ def serve_thankyou(request):
     # If there is a contact info in the session, then they entered it.
     # Otherwise go back to join page.
     if not request.session.get('last-contact', None):
-        return HttpResponseRedirect('/join')
+        return HttpResponseRedirect(reverse('extinctionr.info:join'))
     return render(request, 'pages/welcome/thankyou.html', {})

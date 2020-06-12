@@ -97,7 +97,7 @@
       {% block default_container %}{% block content %}{% endblock %}{% endblock %}
 </div> <!-- mainbody -->
   <footer class="text-center mt-4 mx-0 px-0 pt-2 xr-bg-dark-gray d-print-none">
-    <form class="mb-2" action="{% url 'extinctionr.info:join' %}" method="get">
+    <form class="mb-2" action="{% url 'extinctionr.info:join' %}" method="GET">
       <div class="form-row">
         <div class="col-lg-3 offset-lg-4">
             {{simple_signup_form.email}}
