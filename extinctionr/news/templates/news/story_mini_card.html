@@ -1,5 +1,6 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
+{% with story as story.specific %}
 <div class="card bg-white m-md-1">
     <a href="{% pageurl story %}">
     {% with story.hero_image as hero_image %}
@@ -20,3 +21,4 @@
         <div class="card-text blog-mini-lede pt-1">{{story.lede}}</div>
     </div>
 </div>
+{% endwith %}

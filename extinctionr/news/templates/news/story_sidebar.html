@@ -11,18 +11,25 @@
     </li>
 {% endfor %}
 </ul>
-<hr>
-<h5>Join XR:</h5>
-    <a href="{% url 'extinctionr.info:page' page='join' %}" 
-       class="btn btn-lg btn-primary text-uppercase w-100">Sign-up
-    </a>
+<hr class="d-none d-lg-block">
+<div class="mb-2 d-none d-lg-block">
+    <form action="{% url 'extinctionr.info:join' %}" method="GET">
+        <div class="w-100 px-1">
+            {{simple_signup_form.email}}
+        </div>
+        <div class="mt-1 px-1 w-100">
+            <input class="btn btn-dark xr-hover-bg-green w-100" type="submit" value="Join Us">
+        </div>
+    </form>
+</div>
 <hr>
 <h5>Upcoming Events:</h5>
 {% upcoming_actions %}
 
-<!--
+{% comment %}
     <hr class="thick">
     <div class="position-absolute">
     <a class="twitter-timeline" data-lang="en" href="https://twitter.com/XRboston" data-tweet-limit="3">Tweets by @XRBoston</a> 
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </div> -->
+    </div>
+{% endcomment %}

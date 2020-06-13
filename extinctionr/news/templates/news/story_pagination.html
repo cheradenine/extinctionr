@@ -1,0 +1,29 @@
+{% load news %}
+
+<ul class="page-nav">
+    {% if stories.has_previous %}
+        <li><a href="?page=1">first</a></li>
+        <li><a href="?page={{ stories.previous_page_number }}">previous</a></li>
+    {% else %}
+        <li>first</li>
+        <li>previous</li>
+    {% endif %}
+
+    {% for p in stories.paginator.page_range|elide_pages:stories.number %}
+        {% if p == -1 %}
+            <li>...</li>
+        {% elif p == stories.number %}
+            <li>{{p}}</li>
+        {% else %}
+            <li><a href="?page={{ p }}">{{ p }}</a></li>
+        {% endif %}
+    {% endfor %}
+
+    {% if stories.has_next %}
+        <li><a href="?page={{ stories.next_page_number }}">next</a></li>
+        <li><a href="?page={{ stories.paginator.num_pages }}">last</a></li>
+    {% else %}
+        <li>next</li>
+        <li>last</li>
+    {% endif %}
+</ul>

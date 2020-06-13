@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load tz %}
-{% load static %}
+{% load static compress %}
 {% load news vaquita %}
 {% load wagtailcore_tags wagtailimages_tags %}
 {% block extrahead %}
@@ -105,10 +105,10 @@
           <div class="col w-100">
           {% if related %}
             <h5 class="mb-2 mt-4">Related Stories:</h5>
-            <div data-flickity='{ "cellAlign":"left", "contain":true, "imagesLoaded":true, "pageDots":false, "adaptiveHeight":true }'>
+            <div id="related_stories">
             {% for story in related %}
               <div class="carousel-cell" style="width:45%">
-              {% mini_card story %}
+              {% include 'news/story_mini_card.html' %}
               </div>
             {% endfor %}
             </div>
@@ -116,7 +116,7 @@
           </div>
         </div>
     </div>
-    <div class="col col-lg-3 py-3 px-0 p-lg-3">
+    <div class="col-12 col-lg-3 py-3 px-0 p-lg-3">
       {% story_sidebar %}
     </div>
   </div>
@@ -126,5 +126,20 @@
 {% block extra_js %}
 
 <script type="text/javascript" src="{% static "js/flickity.pkgd.min.js" %}"></script>
-
+{% compress js inline %}
+<script>
+  $(function(){
+    let flkty = new Flickity('#related_stories', {
+      "cellAlign": "left", 
+      "contain": true, 
+      "imagesLoaded": true, 
+      "pageDots": false, 
+      "adaptiveHeight": false
+    });
+    setTimeout(() => {
+      flkty.resize();
+    }, 1);
+  });
+</script>
+{% endcompress %}
 {% endblock %}

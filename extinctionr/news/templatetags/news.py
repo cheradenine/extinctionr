@@ -25,15 +25,11 @@ def elide_pages(range, cur_page):
     return pages
 
 
-@register.inclusion_tag("news/story_sidebar.html")
-def story_sidebar(*args, **kwargs):
+@register.inclusion_tag("news/story_sidebar.html", takes_context=True)
+def story_sidebar(context):
     featured = FeaturedStory.objects.all().order_by('-story__first_published_at')
-    return {'featured_stories': featured}
-
-
-@register.inclusion_tag("news/story_mini_card.html")
-def mini_card(story):
-    return {'story': story.specific}
+    context['featured_stories'] = featured
+    return context
 
 
 @register.inclusion_tag('news/upcoming_actions.html')

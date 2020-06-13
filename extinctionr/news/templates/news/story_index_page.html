@@ -115,42 +115,17 @@ ul.page-nav li a:hover {
     </div>
     </div>
 </div>
-<div class="row">
-    <div class="col">
-		<div class="text-center w-100">
-			{% if stories.paginator.num_pages > 1 %}
-			<ul class="page-nav">
-				{% if stories.has_previous %}
-					<li><a href="?page=1">first</a></li>
-					<li><a href="?page={{ stories.previous_page_number }}">previous</a></li>
-				{% else %}
-					<li>first</li>
-					<li>previous</li>
-				{% endif %}
-
-				{% for p in stories.paginator.page_range|elide_pages:stories.number %}
-					{% if p == -1 %}
-						<li>...</li>
-					{% elif p == stories.number %}
-                        <li>{{p}}</li>
-                    {% else %}
-                        <li><a href="?page={{ p }}">{{ p }}</a></li>
-					{% endif %}
-				{% endfor %}
-
-				{% if stories.has_next %}
-					<li><a href="?page={{ stories.next_page_number }}">next</a></li>
-					<li><a href="?page={{ stories.paginator.num_pages }}">last</a></li>
-				{% else %}
-					<li>next</li>
-					<li>last</li>
-				{% endif %}
-			</ul>
-			{% endif %}
-		</div>
+{% if stories.paginator.num_pages > 1 %}
+    <div class="row">
+        <div class="col">
+            <div class="text-center w-100">
+                {% include 'news/story_pagination.html' %}
+            </div>
+        </div>
     </div>
-</div>
+{% endif %}
 {% endblock %}
+
 {% block extra_js %}
 <script src="{% static 'js/masonry.pkgd.min.js' %}"></script>
 <script src="{% static 'js/imagesloaded.pkgd.min.js' %}"></script>
