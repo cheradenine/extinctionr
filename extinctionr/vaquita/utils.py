@@ -14,9 +14,12 @@ from .models import CustomImage
 class ImageImporter:
     def __init__(self, collection_name=''):
         if collection_name:
-            self.collection, _ = Collection.objects.get_or_create(
-                name=collection_name
-            )
+            try:
+                col = Collection.objects.get(name=collection_name)
+            except Collection.DoesNotExist:
+                root_col = Collection.get_first_root_node()
+                col = root_col.add_child(name=collection_name)
+            self.collection = col
         else:
             self.collection = None
 
