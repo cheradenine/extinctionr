@@ -6,10 +6,9 @@ from django.db import models
 from wagtail.images.models import Image, AbstractImage, AbstractRendition
 
 
-def _filepath_with_date(filepath):
+def _filepath_with_date(filepath, created_at):
     path = PurePath(filepath)
-    today = date.today()
-    return path.parent / str(today.year) / str(today.month) / str(today.day) / path.name
+    return path.parent / str(created_at.year) / str(created_at.month) / path.name
 
 
 class CustomImage(AbstractImage):
@@ -17,7 +16,8 @@ class CustomImage(AbstractImage):
 
     def get_upload_to(self, filename):
         fullpath = super().get_upload_to(filename)
-        return _filepath_with_date(fullpath)
+        created_at = self.created_at if self.created_at else date.today()
+        return _filepath_with_date(fullpath, created_at)
 
 
 class CustomRendition(AbstractRendition):
@@ -29,5 +29,4 @@ class CustomRendition(AbstractRendition):
         )
 
     def get_upload_to(self, filename):
-        fullpath = super().get_upload_to(filename)
-        return _filepath_with_date(fullpath)
+        return self.image.get_upload_to(filename)

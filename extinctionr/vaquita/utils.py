@@ -6,18 +6,17 @@ from urllib.parse import urlparse
 from django.core.files.images import ImageFile
 from wagtail.core.models import Collection
 
+from PIL import Image
+
 from .models import CustomImage
-
-
-def test_image_import():
-    importer = ImageImporter('Media Images')
-    importer.import_from_file('/Users/johnburk/projects/xr/extinctionr/fake_ad.jpg')
 
 
 class ImageImporter:
     def __init__(self, collection_name=''):
         if collection_name:
-            self.collection = Collection.objects.filter(name=collection_name).get()
+            self.collection, _ = Collection.objects.get_or_create(
+                name=collection_name
+            )
         else:
             self.collection = None
 
@@ -25,16 +24,41 @@ class ImageImporter:
         response = requests.get(url)
         path = Path(urlparse(url).path)
         byte_stream = BytesIO(response.content)
-        self._import(path.name, byte_stream)
+        return self._import(path.name, byte_stream)
 
-    def import_from_file(self, filename, title=None):
-        with open(filename, "rb") as byte_stream:
-            self._import(title if title else filename, byte_stream)
+    def import_from_photo(self, photo):
+        # see if this file already exists:
+        path = Path(photo.photo.path)
+        images = CustomImage.filter(file__path__endswith=path.name)
+        if images.count() > 0:
+            return images.first()
+        return self.import_from_file(
+            photo.photo.path,
+            photo.caption,
+            uploaded_by_user=photo.uploader,
+            created_at=photo.created
+        )
 
-    def _import(self, name, byte_stream):
-        image = CustomImage(
+    def import_from_file(self, filename, title=None, **kwargs):
+        p = Path(filename)
+        if not title:
+            title = p.name
+        with p.open("rb") as byte_stream:
+            return self._import(title, byte_stream, **kwargs)
+
+    def _import(self, name, byte_stream, **kwargs):
+        image = CustomImage.objects.create(
+            file=ImageFile(byte_stream, name=name),
             title=name,
-            file=ImageFile(byte_stream, name=name)
+            **kwargs
         )
         image.collection = self.collection
         image.save()
+        return image
+
+
+def clear_image_exif(file_obj):
+    img = Image.open(file_obj.path)
+    img_no_exif = Image.new(img.mode, img.size)
+    img_no_exif.putdata(list(img.getdata()))
+    img_no_exif.save(file_obj.path)
