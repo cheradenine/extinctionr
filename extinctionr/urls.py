@@ -19,13 +19,11 @@ from django.conf import settings
 
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
-from wagtail.contrib.sitemaps.views import sitemap
 from wagtail.core import urls as wagtail_urls
 
 # from django.contrib.auth import views
 from extinctionr.actions.views import propose_talk
 
-from common.views import handler404, handler500
 
 app_name = 'extinctionr'
 
@@ -43,7 +41,7 @@ urlpatterns = [
          include('opportunity.urls', namespace="opportunities")),
     path('relationships/cases/', include('cases.urls', namespace="cases")),
     path('relationships/emails/', include('emails.urls', namespace="emails")),
-    path('admin/', admin.site.urls),
+    path('xadmin/', admin.site.urls),
     path('notifications/', include('django_nyt.urls')),
     path('wiki/', include('wiki.urls')),
     path('markdownx/', include('markdownx.urls')),
@@ -51,7 +49,7 @@ urlpatterns = [
     path('postorius/', include('postorius.urls')),
     path('mm/', include('django_mailman3.urls')),
     path('accounts/', include('allauth.urls')),
-    re_path(r'^cms/', include(wagtailadmin_urls)),
+    re_path(r'^admin/', include(wagtailadmin_urls)),
     re_path(r'^documents/', include(wagtaildocs_urls)),
 ]
 

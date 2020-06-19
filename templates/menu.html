@@ -3,7 +3,7 @@
 <ul class="nav navbar-nav ml-sm-2 ml-lg-auto text-uppercase">
   <li class="nav-item"><a class="nav-link nav-a" id="emergency" href="{% url 'extinctionr.info:page' page='why' %}">The Emergency</a></li>
   <li class="nav-item"><a class="nav-link nav-a" id="demands" href="{% url 'extinctionr.info:page' page='demands' %}">Our Demands</a></li>
-  <li class="nav-item"><a class="nav-link nav-a" id="join" href="{% url 'extinctionr.info:page' page='welcome/' %}">Act Now</a></li>
+  <li class="nav-item"><a class="nav-link nav-a" id="join" href="{% url 'extinctionr.info:page' page='welcome/' %}">Join Us</a></li>
   <li class="nav-item"><a class="nav-link nav-a" id="action" href="{% url 'extinctionr.actions:list-actions' %}">Events</a></li>
   <li class="nav-item"><a class="nav-link nav-a" id="news" href="{% slugurl 'news' %}">News</a></li>
   
@@ -34,7 +34,7 @@
     </a>
     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-admin-dropdown">
       {% if user.is_staff %}
-      <a class="dropdown-item nav-a" id="admin" href="{% url 'admin:index' %}">Admin</a>
+      <a class="dropdown-item nav-a" id="admin" href="{% url 'wagtailadmin_home' %}">Admin</a>
       {% endif %}
       <a class="dropdown-item nav-a" href="{% url 'todo:lists' %}">To do Lists</a>
       <a class="dropdown-item nav-a" href="{% url 'todo:mine' %}">My Tasks</a>
