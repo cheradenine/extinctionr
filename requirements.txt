@@ -30,5 +30,7 @@ wagtailfontawesome
 PyJWT
 django-choices
 django-libsass
+django-sql-explorer=2.1.2
+
 
 

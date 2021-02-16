@@ -37,6 +37,7 @@
     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-admin-dropdown">
       {% if user.is_staff %}
       <a class="dropdown-item nav-a" id="admin" href="{% url 'wagtailadmin_home' %}">Admin</a>
+      <a class="dropdown-item nav-a" id="explore" href="{% url 'explorer_index' %}">Data Explorer</a>
       {% endif %}
       <a class="dropdown-item nav-a" href="{% url 'todo:lists' %}">To do Lists</a>
       <a class="dropdown-item nav-a" href="{% url 'todo:mine' %}">My Tasks</a>

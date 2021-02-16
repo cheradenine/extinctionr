@@ -49,6 +49,7 @@ urlpatterns = [
     path('postorius/', include('postorius.urls')),
     path('mm/', include('django_mailman3.urls')),
     path('accounts/', include('allauth.urls')),
+    re_path(r'^explorer/', include('explorer.urls')),
     re_path(r'^admin/', include(wagtailadmin_urls)),
     re_path(r'^documents/', include(wagtaildocs_urls)),
 ]
