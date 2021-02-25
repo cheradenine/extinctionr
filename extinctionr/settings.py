@@ -135,7 +135,6 @@ MIDDLEWARE = [
     "crum.CurrentRequestUserMiddleware",
     "postorius.middleware.PostoriusMiddleware",
     "wagtail.contrib.legacy.sitemiddleware.SiteMiddleware",
-#    "wagtail.core.middleware.SiteMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 if DEBUG:
