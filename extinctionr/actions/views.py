@@ -183,7 +183,7 @@ def list_actions(request):
             action = form.save()
             return redirect(action.get_absolute_url())
         else:
-            return HttpResponseBadRequest
+            return HttpResponseBadRequest()
 
     # Attempt to read user and any url params:
     try:
