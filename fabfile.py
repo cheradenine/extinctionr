@@ -1,7 +1,7 @@
 from fabric import Connection, task
 
 
-conn = Connection('xr@xrmass.org')
+conn = Connection('xr@xrboston.org')
 
 @task
 def deploy(ctx):
