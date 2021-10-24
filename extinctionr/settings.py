@@ -376,7 +376,7 @@ POSTORIUS_TEMPLATE_BASE_URL = "http://localhost:8000"
 
 ADMINS = [("Webmaster", "webmaster@xrboston.org")]
 SERVER_EMAIL = "webmaster@xrboston.org"
-ACTION_RSVP_WHITELIST = ['johnb.xr@pm.me']
+ACTION_RSVP_WHITELIST = []
 
 # Wagtail settings
 WAGTAIL_SITE_NAME = "XR Boston"
