@@ -309,7 +309,8 @@ LOGGING = {
     "formatters": {
         "django.server": {
             "()": "django.utils.log.ServerFormatter",
-            "format": "[%(server_time)s] %(message)s",
+            "format": "[{server_time}] {message}",
+            'style': '{',
         }
     },
     "handlers": {
@@ -317,6 +318,7 @@ LOGGING = {
             "level": "INFO",
             "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
+            "formatter": "django.server",
         },
         "console_debug_false": {
             "level": "ERROR",
@@ -347,7 +349,7 @@ LOGGING = {
         },
         "extinctionr": {
             "handlers": ["console", "console_debug_false", "mail_admins"],
-            "level": "WARNING",
+            "level": "INFO",
         },
     },
 }
@@ -374,6 +376,7 @@ POSTORIUS_TEMPLATE_BASE_URL = "http://localhost:8000"
 
 ADMINS = [("Webmaster", "webmaster@xrboston.org")]
 SERVER_EMAIL = "webmaster@xrboston.org"
+ACTION_RSVP_WHITELIST = ['johnb.xr@pm.me']
 
 # Wagtail settings
 WAGTAIL_SITE_NAME = "XR Boston"

@@ -73,7 +73,7 @@ def notify_commitments(action, threshold, action_url):
 
 
 def _render_action_email(action, attendee, template):
-    if isinstance(template, 'str'):
+    if isinstance(template, str):
         template = Engine.get_default().get_template(template)
 
     ctx = {
@@ -93,7 +93,10 @@ def confirm_rsvp(action, attendee, ics_data):
     Will not notify attendees twice.
     """
     if now() > (action.when - timedelta(hours=2)):
-        return 0
+        return
+
+    if attendee.contact.email not in settings.ACTION_RSVP_WHITELIST:
+        return
 
     # Prevents getting a reminder too soon.
     attendee.notified = now()
@@ -112,7 +115,7 @@ class EventReminder(Enum):
     SOON = 2
 
 
-def send_action_reminder(action, attendees, reminder, whitelist=None):
+def send_action_reminder(action, attendees, reminder):
     if reminder is EventReminder.NEXT_DAY:
         template_name = "action_email_reminder_day.html"
         subject = "[XR Boston] Event reminder: {} is coming up".format(action.text_title)
@@ -130,7 +133,7 @@ def send_action_reminder(action, attendees, reminder, whitelist=None):
     for attendee in attendees:
         if attendee in notified:
             continue
-        if whitelist and attendee.contact.email not in whitelist:
+        if attendee.contact.email not in settings.ACTION_RSVP_WHITELIST:
             continue
         notified.add(attendee)
         msg = _render_action_email(action, attendee, template)

@@ -21,20 +21,6 @@ from extinctionr.actions.comm import EventReminder, send_action_reminder
 logger = logging.getLogger(__name__)
 
 
-# Temporary whitelist of contacts while this feature is being tested
-reminder_whitelist = set()
-
-def load_whitelist():
-    whitelist = os.path.join(settings.BASE_DIR, "reminder_whitelist.txt")
-    global reminder_whitelist
-    try:
-        with open(whitelist) as f:
-            for line in f.readlines():
-                reminder_whitelist.add(line.strip())
-    except FileNotFoundError:
-        logger.error('No whitelist file found. Whitelist will be empty and no notifications sent.')
-
-
 def _upcoming_actions(time_now, hours):
     start = time_now + timedelta(hours=hours, minutes=-30)
     end = time_now + timedelta(hours=hours, minutes=30)
@@ -57,10 +43,11 @@ def _send_reminders(hours, reminder_type):
 
         if attendees.count() > 0:
             logger.info('Will attempt to notify %d attendees', attendees.count())
-            sent = send_action_reminder(action, attendees, reminder_type, reminder_whitelist)
+            sent = send_action_reminder(action, attendees, reminder_type)
             if sent > 0:
                 logger.info(
-                    "Sent %d reminbers for %s at %s",
+                    "Sent %d %s for %s at %s",
+                    "reminder" if sent == 1 else "reminders",
                     sent,
                     action.text_title,
                     dateformat.format(localtime(time_now), "l, F jS @ g:iA"),
@@ -91,14 +78,14 @@ class Command(BaseCommand):
     help = "Runs APScheduler for action reminders."
 
     def handle(self, *args, **options):
-        load_whitelist()
 
         scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
         scheduler.add_job(
             action_reminders_job,
-            trigger=CronTrigger(minute="*/30"),  # Every 30 minutes
+#            trigger=CronTrigger(minute="*/30"),  # Every 30 minutes
+            trigger=CronTrigger(second="*/10"),
             id="send_action_reminders",  # The `id` assigned to each job MUST be unique
             max_instances=1,
             replace_existing=True,
