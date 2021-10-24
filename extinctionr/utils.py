@@ -10,12 +10,12 @@ from contacts.models import Contact, Address
 
 
 def _get_names(name, first, last):
-    sname = name.split(' ', 1)
+    sname = name.split(" ", 1)
     if len(sname) == 2:
         first_name, last_name = sname
     else:
         first_name = sname[0]
-        last_name = '?'
+        last_name = "?"
     first_name = first if first else first_name
     last_name = last if last else last_name
     return (first_name, last_name)
@@ -37,14 +37,14 @@ def _update_model(model, **kwargs):
 
 
 def _has_name(name):
-    return name not in ('', '?', 'unknown')
+    return name not in ("", "?", "unknown")
 
 
-def get_contact(email, name='', first_name='', last_name='', **kwargs):
+def get_contact(email, name="", first_name="", last_name="", **kwargs):
     email = email.lower().strip()
     assert email
     addr_keys = [f.name for f in Address._meta.fields]
-    addr_keys.remove('id')
+    addr_keys.remove("id")
 
     # Create address dict from fields in kwargs.
     address = {k: kwargs.pop(k) for k in addr_keys if k in kwargs}
@@ -68,9 +68,9 @@ def get_contact(email, name='', first_name='', last_name='', **kwargs):
 
     # Maybe update new name info.
     if _has_name(last_name):
-        resave = _update_model_attr(user, 'last_name', last_name)
+        resave = _update_model_attr(user, "last_name", last_name)
     if _has_name(first_name):
-        resave = _update_model_attr(user, 'first_name', first_name)
+        resave = _update_model_attr(user, "first_name", first_name)
 
     if address:
         # User had no address.
@@ -87,22 +87,23 @@ def get_contact(email, name='', first_name='', last_name='', **kwargs):
 
 
 def get_last_contact(request):
-    last = request.session.get('last-contact', None)
+    last = request.session.get("last-contact", None)
     if last:
         return Contact.objects.get(pk=last)
 
 
 def set_last_contact(request, contact):
     if contact:
-        request.session['last-contact'] = contact.id
+        request.session["last-contact"] = contact.id
     else:
-        request.session.pop('last-contact', None)
+        request.session.pop("last-contact", None)
 
 
 def base_url():
+    # TODO: make sure this doesn't hit the database each time.
     current_site = Site.objects.get_current()
-    scheme = 'http' if settings.DEBUG else 'https'
-    return '%s://%s' % (scheme, current_site.domain)
+    scheme = "http" if settings.DEBUG else "https"
+    return "%s://%s" % (scheme, current_site.domain)
 
 
 # https://github.com/django-compressor/django-compressor/issues/910#issuecomment-500502936
@@ -110,10 +111,10 @@ def compress(css, **kwargs):
     capture_svg = re.compile(r'url\("(data:image/svg.*?svg%3[Ee])\"\)')
     data_urls = re.findall(capture_svg, css)
     for data_url in data_urls:
-        css = css.replace(data_url, data_url.replace(' ', '%20'))
+        css = css.replace(data_url, data_url.replace(" ", "%20"))
     css = cssmin(css, **kwargs)
     return css
 
 
 class CSSMinFilter(CallbackOutputFilter):
-    callback = 'extinctionr.utils.compress'
+    callback = "extinctionr.utils.compress"

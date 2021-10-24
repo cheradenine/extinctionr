@@ -82,7 +82,7 @@ class ActionAdmin(ThumbnailMixin, ModelAdmin):
     menu_icon = 'date'
     list_display = ('name', 'slug', 'admin_thumb', 'when',)
     filter_vertical = ('photos',)
-    readonly_fields = ('modified', )
+    readonly_fields = ('modified',)
     add_to_settings_menu = False
     exclude_from_explorer = False
     thumb_image_field_name = 'image'

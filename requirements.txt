@@ -31,6 +31,4 @@ PyJWT
 django-choices
 django-libsass
 django-sql-explorer
-
-
-
+django-apscheduler

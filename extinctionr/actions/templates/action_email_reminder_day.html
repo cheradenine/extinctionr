@@ -1,0 +1,10 @@
+{% extends "action_email_base.html" %}
+
+{% block message_content %}
+
+Hi {{contact.first_name}},
+<br><br>
+Your event "{{action.text_title}}" is coming up! 
+We're looking forward to seeing you on {{action.when|date:'l, F jS'}} at {{action.when|date:'P'}}
+
+{% endblock %}

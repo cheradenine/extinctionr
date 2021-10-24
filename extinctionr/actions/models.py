@@ -21,7 +21,7 @@ from taggit.managers import TaggableManager
 from contacts.models import Contact
 
 from extinctionr.info.models import Photo
-from extinctionr.utils import get_contact
+from extinctionr.utils import get_contact, base_url
 from extinctionr.vaquita.widgets import ZOrderMarkdownTextarea
 
 
@@ -44,7 +44,7 @@ class Action(models.Model):
     description = MarkdownField(default='', blank=True, help_text='Markdown formatted')
     slug = models.SlugField(unique=True, help_text='Short form of the title, for URLs')
     public = models.BooleanField(default=True, blank=True, help_text='Whether this action should be listed publicly')
-    location = models.TextField(default='', blank=True, help_text='Event location will be converted to a google maps link, unless you format it as a Markdown link -- [something](http://foo.com)')
+    location = models.TextField(default='', blank=True, help_text='Event location will be converted to a google maps link, unless you format it as a Markdown link -- [link text](http://example.com)')
     available_roles = models.CharField(default='', blank=True, max_length=255, help_text='List of comma-separated strings')
     # Will need to figure out how to migrate this over.
     photos = models.ManyToManyField(Photo, blank=True)
@@ -60,6 +60,7 @@ class Action(models.Model):
     show_commitment = models.BooleanField(blank=True, default=False, help_text='Whether to show the conditional commitment fields')
     max_participants = models.IntegerField(blank=True, default=0, help_text="Maximun number of people allowed to register")
     accessibility = models.TextField(default='', help_text="Indicate what the accessibility accomodations are for this location.")
+    contact_email = models.TextField(default='', null=True, help_text="Contact info of event organizer.")
 
     tags = TaggableManager(blank=True, help_text="Attendees will automatically be tagged with these tags")
     objects = ActionManager()
@@ -71,6 +72,7 @@ class Action(models.Model):
             FieldPanel('location'),
             FieldPanel('slug'),
         ]),
+        FieldPanel('contact_email'),
         MarkdownPanel('description', widget=ZOrderMarkdownTextarea),
         ImageChooserPanel('image'),
         FieldPanel('tags'),
@@ -94,6 +96,10 @@ class Action(models.Model):
 
     def get_absolute_url(self):
         return reverse('extinctionr.actions:action', kwargs={'slug': self.slug})
+
+    @property
+    def full_url(self):
+        return '{}{}'.format(base_url(), self.get_absolute_url())
 
     def signup(self, email, role, name='', notes='', promised=None, commit=0):
         if not isinstance(role, ActionRole):

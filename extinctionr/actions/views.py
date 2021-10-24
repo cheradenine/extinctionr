@@ -18,7 +18,7 @@ from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.html import strip_tags
 from django.utils.http import http_date
-from django.utils.timezone import now, localtime, localdate
+from django.utils.timezone import now, localtime, localdate, make_aware
 from django.urls import reverse
 from django.views.decorators.cache import never_cache, cache_page
 from django.views.decorators.csrf import csrf_protect
@@ -78,7 +78,7 @@ def _get_action_request_params(request):
         user = request.user
     req_date = request.GET.get('month', '')
     if req_date:
-        current_date = datetime.strptime(req_date, '%Y-%m')
+        current_date = make_aware(datetime.strptime(req_date, '%Y-%m'))
     else:
         current_date = localtime().date().replace(day=1)
 
@@ -95,6 +95,9 @@ def _get_action_request_params(request):
 
 
 def _make_date_range(current_date, include_future=True, include_past=7):
+    current_date = datetime.combine(current_date, datetime.min.time())
+    current_date = make_aware(current_date)
+
     start_date = current_date - timedelta(include_past)
     if not include_future:
         end_date = current_date + timedelta(38)
@@ -197,7 +200,7 @@ def list_actions(request):
         actions = actions.filter(tags__name=tag_filter)
 
     # Generate view for upcoming actions.
-    today_tz = localtime().date()
+    today_tz = make_aware(datetime.combine(localtime().date(), datetime.min.time()))
     future_actions = actions.filter(when__gte=today_tz)
 
     # Handle pagination range.

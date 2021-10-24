@@ -28,9 +28,9 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv("DEBUG", "true") == "true"
 
 ALLOWED_HOSTS = [
-    "www.xrmass.org",
-    "xrmass.org",
-    "test.xrmass.org",
+    "www.xrboston.org",
+    "xrboston.org",
+    "test.xrboston.org",
     "localhost",
 ]
 
@@ -119,6 +119,7 @@ INSTALLED_APPS = [
     # 'allauth.socialaccount.providers.facebook',
     # 'allauth.socialaccount.providers.twitter',
     # 'allauth.socialaccount.providers.stackexchange',
+    "django_apscheduler",
 ]
 
 MIDDLEWARE = [
@@ -191,7 +192,7 @@ DATABASES = {
     "readonly": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-    }
+    },
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
@@ -321,6 +322,7 @@ LOGGING = {
             "level": "ERROR",
             "filters": ["require_debug_false"],
             "class": "logging.StreamHandler",
+            "formatter": "django.server",
         },
         "django.server": {
             "level": "INFO",
@@ -342,6 +344,10 @@ LOGGING = {
             "handlers": ["django.server"],
             "level": "INFO",
             "propagate": False,
+        },
+        "extinctionr": {
+            "handlers": ["console", "console_debug_false", "mail_admins"],
+            "level": "WARNING",
         },
     },
 }
