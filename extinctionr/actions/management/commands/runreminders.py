@@ -84,8 +84,7 @@ class Command(BaseCommand):
 
         scheduler.add_job(
             action_reminders_job,
-#            trigger=CronTrigger(minute="*/30"),  # Every 30 minutes
-            trigger=CronTrigger(second="*/10"),
+            trigger=CronTrigger(minute="*/30"),  # Every 30 minutes
             id="send_action_reminders",  # The `id` assigned to each job MUST be unique
             max_instances=1,
             replace_existing=True,
