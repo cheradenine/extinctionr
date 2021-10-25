@@ -88,7 +88,7 @@ def _render_action_email(action, attendee, template):
 
 def _check_attendee_whitelist(attendee):
     whitelist = settings.ACTION_RSVP_WHITELIST
-    if len(whitelist) == 1 and whitelist[0] == '*':
+    if '*' in whitelist:
         return True
     return attendee.contact.email in whitelist
 
