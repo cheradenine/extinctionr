@@ -1,0 +1,11 @@
+Hi {{contact.first_name}},
+
+Your event "{{action.text_title}}" is coming up! 
+We're looking forward to seeing you on {{action.when|date:'l, F jS'}} at {{action.when|date:'P'}}
+
+Event details: {{action.full_url}}
+Contact: {{outreach_email}}
+
+In Solidarity,
+Extinction Rebellion Boston
+

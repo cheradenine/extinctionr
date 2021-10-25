@@ -50,10 +50,10 @@ def notify_new_volunteer(volunteer):
     message = '''{who} <{email}> has signed up to volunteer.
 
 View all new requests at:
-  {baseurl}/cms/circles/volunteerrequest/?status__exact=n
+  {baseurl}/admin/circles/volunteerrequest/?status__exact=n
 
 Edit this request at:
-  {baseurl}/cms/circles/volunteerrequest/edit/{pk}/
+  {baseurl}/admin/circles/volunteerrequest/edit/{pk}/
 
 '''.format(who=contact, email=contact.email, baseurl=base_url(), pk=volunteer.id)
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, outreach_circle.get_notification_addresses())

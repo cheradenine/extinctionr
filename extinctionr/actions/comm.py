@@ -3,13 +3,14 @@ import logging
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.mail import EmailMessage, send_mass_mail
+from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mass_mail
 from django.utils.timezone import now, localtime
 from django.utils import dateformat
 from django.template import Engine, Context
 from .models import Action, Attendee
 
 from extinctionr.utils import base_url
+from extinctionr.circles import get_circle
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +73,7 @@ def notify_commitments(action, threshold, action_url):
         return len(messages)
 
 
-def _render_action_email(action, attendee, template):
+def _render_action_email(action, attendee, outreach_email, template):
     if isinstance(template, str):
         template = Engine.get_default().get_template(template)
 
@@ -80,6 +81,7 @@ def _render_action_email(action, attendee, template):
         "action": action,
         "contact": attendee.contact,
         "base_url": base_url(),
+        "outreach_email": outreach_email,
     }
     msg_body = template.render(Context(ctx))
 
@@ -88,9 +90,15 @@ def _render_action_email(action, attendee, template):
 
 def _check_attendee_whitelist(attendee):
     whitelist = settings.ACTION_RSVP_WHITELIST
-    if '*' in whitelist:
+    if "*" in whitelist:
         return True
     return attendee.contact.email in whitelist
+
+
+class EventReminder(Enum):
+    RSVP = 0
+    NEXT_DAY = 1
+    SOON = 2
 
 
 def confirm_rsvp(action, attendee, ics_data):
@@ -108,47 +116,71 @@ def confirm_rsvp(action, attendee, ics_data):
     # Prevents getting a reminder too soon.
     attendee.notified = now()
 
+    outreach = get_circle("outreach")
+
     from_email = settings.NOREPLY_FROM_EMAIL
     subject = "[XR Boston] RSVP confirmation for {}".format(action.text_title)
-    msg_body = _render_action_email(action, attendee, "action_email_rsvp.html")
+    msg_body_html = _render_action_email(
+        action, attendee, outreach.public_email, "action_email_rsvp.html"
+    )
+    msg_body_plain = _render_action_email(
+        action, attendee, outreach.public_email, "action_email_rsvp.txt"
+    )
 
-    msg = EmailMessage(subject, msg_body, from_email, [attendee.contact.email])
+    msg = EmailMultiAlternatives(
+        subject, msg_body_plain, from_email, [attendee.contact.email]
+    )
+    msg.attach_alternative(msg_body_html, "text/html")
     msg.attach(f"{action.slug}.ics", ics_data, "text/calendar")
     msg.send()
+
     attendee.save()
 
 
-class EventReminder(Enum):
-    NEXT_DAY = 1
-    SOON = 2
 
 
 def send_action_reminder(action, attendees, reminder):
+    engine = Engine.get_default()
+
     if reminder is EventReminder.NEXT_DAY:
-        template_name = "action_email_reminder_day.html"
-        subject = "[XR Boston] Event reminder: {} is coming up".format(action.text_title)
+        template_html = engine.get_template("action_email_reminder_day.html")
+        template_plain = engine.get_template("action_email_reminder_day.txt")
+        subject = "[XR Boston] Event reminder: {} is coming up".format(
+            action.text_title
+        )
     elif reminder is EventReminder.SOON:
-        template_name = "action_email_reminder_soon.html"
-        subject = "[XR Boston] Event reminder: {} is startng soon".format(action.text_title)
+        template_html = engine.get_template("action_email_reminder_soon.html")
+        template_plain = engine.get_template("action_email_reminder_soon.txt")
+        subject = "[XR Boston] Event reminder: {} is startng soon".format(
+            action.text_title
+        )
     else:
         raise ValueError("Unknown reminder type")
 
     from_email = settings.NOREPLY_FROM_EMAIL
-    template = Engine.get_default().get_template(template_name)
+    outreach = get_circle("outreach")
 
     notified = set()
     messages = []
+    # Can't use send_mass_mail because it doesn't work with html
+    mail_connection = django.core.mail.get_connection()
+
     for attendee in attendees:
         if attendee in notified:
             continue
         if not _check_attendee_whitelist(attendee):
             continue
         notified.add(attendee)
-        msg = _render_action_email(action, attendee, template)
-        messages.append((subject, msg, from_email, [attendee.contact.email]))
+        msg_body_plain = _render_action_email(action, attendee, outreach.public_email, template_plain)
+        msg_body_html = _render_action_email(action, attendee, outreach.public_email, template_html)
+        msg = EmailMultiAlternatives(subject, msg_body_plain, from_email, [attendee.contact.email], connection=mail_connection)
+        msg.attach_alternative(msg_body_html, "text/html")
+        messages.append(msg)
         # Record when they were notified so that we don't do it again right away.
         attendee.notified = now()
-    send_mass_mail(messages)
+
+    mail_connection.send_messages(messages)
+    
     for attendee in notified:
         attendee.save()
 
