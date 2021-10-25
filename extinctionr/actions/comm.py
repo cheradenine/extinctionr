@@ -45,7 +45,7 @@ def notify_commitments(action, threshold, action_url):
         subject = "[XR] We've got enough to commit to %s" % action.name
         messages = []
         modified = set()
-        from_email = settings.DEFAULT_FROM_EMAIL
+        from_email = settings.NOREPLY_FROM_EMAIL
         when = dateformat.format(localtime(action.when), "l, F jS @ g:iA")
         for attendee in to_send:
             if attendee in modified:
@@ -125,7 +125,7 @@ def send_action_reminder(action, attendees, reminder):
     else:
         raise ValueError("Unknown reminder type")
 
-    from_email = settings.DEFAULT_FROM_EMAIL
+    from_email = settings.NOREPLY_FROM_EMAIL
     template = Engine.get_default().get_template(template_name)
 
     notified = set()

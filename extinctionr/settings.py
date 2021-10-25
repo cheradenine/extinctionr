@@ -280,6 +280,7 @@ ENABLE_GOOGLE_LOGIN = os.getenv("ENABLE_GOOGLE_LOGIN", False)
 
 ADMIN_EMAIL = "webmaster@xrboston.org"
 DEFAULT_FROM_EMAIL = "webmaster@xrboston.org"
+NOREPLY_FROM_EMAIL = "noreply@xrboston.org"
 
 PHONENUMBER_DEFAULT_REGION = "US"
 
