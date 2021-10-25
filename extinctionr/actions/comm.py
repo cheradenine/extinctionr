@@ -86,6 +86,13 @@ def _render_action_email(action, attendee, template):
     return msg_body
 
 
+def _check_attendee_whitelist(attendee):
+    whitelist = settings.ACTION_RSVP_WHITELIST
+    if len(whitelist) == 1 and whitelist[0] == '*':
+        return True
+    return attendee.contact.email in whitelist
+
+
 def confirm_rsvp(action, attendee, ics_data):
     """
     Send notification email to attendee when they register.
@@ -95,13 +102,13 @@ def confirm_rsvp(action, attendee, ics_data):
     if now() > (action.when - timedelta(hours=2)):
         return
 
-    if attendee.contact.email not in settings.ACTION_RSVP_WHITELIST:
+    if not _check_attendee_whitelist(attendee):
         return
 
     # Prevents getting a reminder too soon.
     attendee.notified = now()
 
-    from_email = settings.DEFAULT_FROM_EMAIL
+    from_email = settings.NOREPLY_FROM_EMAIL
     msg_body = _render_action_email(action, attendee, "action_email_rsvp.html")
 
     msg = EmailMessage(subject, msg_body, from_email, [attendee.contact.email])
@@ -133,7 +140,7 @@ def send_action_reminder(action, attendees, reminder):
     for attendee in attendees:
         if attendee in notified:
             continue
-        if attendee.contact.email not in settings.ACTION_RSVP_WHITELIST:
+        if not _check_attendee_whitelist(attendee):
             continue
         notified.add(attendee)
         msg = _render_action_email(action, attendee, template)

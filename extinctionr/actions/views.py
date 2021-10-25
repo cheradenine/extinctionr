@@ -280,7 +280,6 @@ def list_actions(request):
 
 @cache_page(1200)
 def show_action(request, slug):
-    enable_send_rsvp = False # TODO: not sure what to do about email yet.
     action = get_object_or_404(Action, slug=slug)
     ctx = {'action': action}
     if request.user.is_authenticated:
@@ -307,10 +306,9 @@ def show_action(request, slug):
             if commit:
                 messages.info(request, "We will notify you once at least %d others commit" % commit)
             set_last_contact(request, attendee.contact)
-            if enable_send_rsvp:
-                ical_data = str(action_to_ical(action, request))
-                action_url = build_action_full_url(action, request)
-                confirm_rsvp(action, attendee, action_url, ical_data)
+            ical_data = str(action_to_ical(action, request))
+            # Send confirmation email.
+            confirm_rsvp(action, attendee, ical_data)
             return redirect(next_url)
     else:
         contact = get_contact(email=request.user.email) if request.user.is_authenticated else get_last_contact(request)
