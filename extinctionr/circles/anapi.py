@@ -20,14 +20,14 @@ def _get_people_api():
     resp = requests.get(AN_ENTRY_POINT, headers=AN_HEADERS)
     if resp.status_code != 200:
         logger.warning(
-            'get_people_api failed with {0}:{1}'.format(resp.status_code, resp.text)
+            'get_people_api failed with %d:%s', resp.status_code, resp.text
         )
 
     try:
         people_api = resp.json()['_links']["osdi:person_signup_helper"]["href"]
     except KeyError:
         logger.warning(
-            'get_people_api failed to parse response: {0}'.format(resp.text)
+            'get_people_api failed to parse response: %s', resp.text
         )
 
     # TODO: maybe cache this.
@@ -56,4 +56,6 @@ def add_to_action_networks(contact):
     }
     resp = requests.post(people_url, headers=AN_HEADERS, json=payload)
     if resp.status_code != 200:
-        logger.warning('add_person failed: {0}'.format(resp.text))
+        logger.warning('POST to %s failed: %s', people_url, resp.text)
+
+    
