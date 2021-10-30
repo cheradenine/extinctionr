@@ -9,6 +9,7 @@ from django.utils.text import Truncator
 from html.parser import HTMLParser
 
 from extinctionr.actions import models
+from extinctionr.actions.utils import HrefExtractor
 from markdownx.utils import markdownify
 
 register = template.Library()
@@ -32,19 +33,6 @@ def highlight_action(*args, **kwargs):
     except IndexError:
         action = None
     return {'action': action}
-
-
-# Need to pull the href attribute out of the link.
-class HrefExtractor(HTMLParser):
-    def __init__(self, link_tag):
-        super().__init__()
-        self.href = None
-        self.feed(link_tag)
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "a" and self.href is None:
-            hrefs = [val for name, val in attrs if name == "href"]
-            self.href = hrefs[0]
 
 
 @register.simple_tag(name='calendar_url', takes_context=True)
@@ -72,6 +60,9 @@ def calendar_url(context, action, service):
     desc = action_desc(action, abs_url)
     location = action_loc(action)
 
+    # Outlook and office live:
+    #https://outlook.live.com/calendar/0/deeplink/compose?body=Join%20me%20for%20an%20incredible%20experience%2C%20etc.&enddt=2021-10-28T12%3A45%3A00%2B00%3A00&location=zoom&path=%2Fcalendar%2Faction%2Fcompose&rru=addevent&startdt=2021-10-28T12%3A15%3A00%2B00%3A00&subject=My%20amazing%20event
+    #https://outlook.office.com/calendar/0/deeplink/compose?body=Join%20me%20for%20an%20incredible%20experience%2C%20etc.&enddt=2021-10-28T12%3A45%3A00%2B00%3A00&location=zoom&path=%2Fcalendar%2Faction%2Fcompose&rru=addevent&startdt=2021-10-28T12%3A15%3A00%2B00%3A00&subject=My%20amazing%20event    
     if service == "Google":
         start, end = action_times(action, '%Y%m%dT%H%M00Z')
         dates = urlquote_plus(f"{start}/{end}")

@@ -103,7 +103,11 @@ not working yet because we need actual address data for events.
 		</div>
 		{% if action.location %}
 		<div class="action-loc">
-			<i class="fas fa-map-marker-alt action-icon" title="Map Marker"></i>
+			{% if action.virtual %}
+				<i class="fas fa-video" title="Video"></i>
+			{% else %}
+				<i class="fas fa-map-marker-alt action-icon" title="Map Marker"></i>
+			{% endif %}
 			<span class="small">{{action.location_link}}</span>
 		</div>
 		{% endif %}

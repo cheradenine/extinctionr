@@ -1,4 +1,6 @@
 from django.contrib.admin.utils import quote
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 from wagtail.contrib.modeladmin.helpers import ButtonHelper
 from wagtail.contrib.modeladmin.mixins import ThumbnailMixin
@@ -9,7 +11,7 @@ from wagtail.contrib.modeladmin.options import (
 from wagtail.contrib.modeladmin.views import EditView, CreateView
 
 from .models import Action
-
+from .utils import markdown_link_validator
 
 class ActionButtonHelper(ButtonHelper):
     view_button_classnames = [
@@ -45,7 +47,20 @@ class SaveAndContinue:
     def form_valid(self, form):
         # Have to save instance this form is working with:
         self._instance = form.instance
-        return super().form_valid(form)
+        res = super().form_valid(form)
+
+        action = self._instance
+        url_validator = URLValidator(schemes=["http", "https"])
+        try:
+            if action.virtual:
+                url_validator(action.location)
+            elif action.location.startswith("["):
+                markdown_link_validator(action.location)
+        except ValidationError as err:
+            form.add_error('location', err)
+            return self.form_invalid(form)
+        return res
+
 
     def get_success_message_buttons(self, instance):
         if self._is_continue():
@@ -88,21 +103,7 @@ class ActionAdmin(ThumbnailMixin, ModelAdmin):
     thumb_image_field_name = 'image'
     thumb_image_filter_spec = 'fill-112x63'
     thumb_image_width = 112
-
-    def create_view(self, request):
-        view = super().create_view(request)
-        self._enable_slug_editing(view)
-        return view
-
-    def _enable_slug_editing(self, view):
-        ''' Tricks the editor into enabling some javascript normally
-            used on Page models to sync the title with the slug
-        '''
-        context_data = getattr(view, 'context_data', None)
-        if context_data:
-            form = context_data['form']
-            form.fields['name'].widget.attrs['id'] = 'id_title'
-            form.fields['slug'].widget.attrs['id'] = 'id_slug'
+    form_view_extra_js = ["js/action_admin.js", ]
 
 
 modeladmin_register(ActionAdmin)

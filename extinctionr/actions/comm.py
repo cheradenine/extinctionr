@@ -3,7 +3,7 @@ import logging
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mass_mail
+from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mass_mail, get_connection
 from django.utils.timezone import now, localtime
 from django.utils import dateformat
 from django.template import Engine, Context
@@ -140,6 +140,7 @@ def confirm_rsvp(action, attendee, ics_data):
 
 
 def send_action_reminder(action, attendees, reminder):
+    
     engine = Engine.get_default()
 
     if reminder is EventReminder.NEXT_DAY:
@@ -160,10 +161,15 @@ def send_action_reminder(action, attendees, reminder):
     from_email = settings.NOREPLY_FROM_EMAIL
     outreach = get_circle("outreach")
 
+    if not outreach:
+        logger.warning("Outreach circle not found. App is misconfigured and will not send mail.")
+        return 0
+
     notified = set()
     messages = []
+
     # Can't use send_mass_mail because it doesn't work with html
-    mail_connection = django.core.mail.get_connection()
+    mail_connection = get_connection()
 
     for attendee in attendees:
         if attendee in notified:
