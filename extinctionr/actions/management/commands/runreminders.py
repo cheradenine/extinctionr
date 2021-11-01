@@ -47,8 +47,8 @@ def _send_reminders(hours, reminder_type):
             if sent > 0:
                 logger.info(
                     "Sent %d %s for %s at %s",
-                    "reminder" if sent == 1 else "reminders",
                     sent,
+                    "reminder" if sent == 1 else "reminders",
                     action.text_title,
                     dateformat.format(localtime(time_now), "l, F jS @ g:iA"),
                 )
@@ -93,14 +93,12 @@ class Command(BaseCommand):
 
         scheduler.add_job(
             delete_old_job_executions,
-            trigger=CronTrigger(
-                day_of_week="mon", hour="00", minute="00"
-            ),  # Midnight on Monday, before start of the next work week.
+            trigger=CronTrigger(hour="00", minute="00"),
             id="delete_old_job_executions",
             max_instances=1,
             replace_existing=True,
         )
-        logger.info("Added weekly job: 'delete_old_job_executions'.")
+        logger.info("Added nightly job: 'delete_old_job_executions'.")
 
         try:
             logger.info("Starting scheduler...")

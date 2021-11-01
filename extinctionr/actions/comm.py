@@ -118,6 +118,10 @@ def confirm_rsvp(action, attendee, ics_data):
 
     outreach = get_circle("outreach")
 
+    if not outreach:
+        logger.warning("Outreach circle not found. App is misconfigured and will not send mail.")
+        return 0
+
     from_email = settings.NOREPLY_FROM_EMAIL
     subject = "[XR Boston] RSVP confirmation for {}".format(action.text_title)
     msg_body_html = _render_action_email(
@@ -171,10 +175,15 @@ def send_action_reminder(action, attendees, reminder):
     # Can't use send_mass_mail because it doesn't work with html
     mail_connection = get_connection()
 
+    time_now = now()
+
     for attendee in attendees:
         if attendee in notified:
             continue
         if not _check_attendee_whitelist(attendee):
+            continue
+        # If they got a reminder less than one day ago, skip this one.
+        if attendee.notified and time_now < (attendee.notified + timedelta(days=1)):
             continue
         notified.add(attendee)
         msg_body_plain = _render_action_email(action, attendee, outreach.public_email, template_plain)
@@ -183,7 +192,7 @@ def send_action_reminder(action, attendees, reminder):
         msg.attach_alternative(msg_body_html, "text/html")
         messages.append(msg)
         # Record when they were notified so that we don't do it again right away.
-        attendee.notified = now()
+        attendee.notified = time_now
 
     mail_connection.send_messages(messages)
     
