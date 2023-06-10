@@ -39,10 +39,6 @@ def _send_reminders(hours, reminder_type):
 
     for action in actions:
 
-        # Filter actions that don't have reminders set.
-        if not action.send_reminders:
-            continue
-
         attendees = (
             Attendee.objects.filter(action=action)
             .filter(Q(notified__isnull=True) | Q(notified__lte=notification_cutoff))
