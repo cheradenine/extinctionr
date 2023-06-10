@@ -91,6 +91,12 @@ class Action(models.Model):
         default="", null=True, help_text="Contact info of event organizer."
     )
 
+    send_reminders = models.BooleanField(
+        blank=True,
+        default=True,
+        help_text="Send reminders for the event to participants"
+    )
+
     tags = TaggableManager(
         blank=True, help_text="Attendees will automatically be tagged with these tags"
     )
@@ -110,14 +116,13 @@ class Action(models.Model):
         MarkdownPanel("description", widget=ZOrderMarkdownTextarea),
         ImageChooserPanel("image"),
         FieldPanel("tags"),
-        FieldRowPanel(
-            [
-                FieldPanel("public"),
-                FieldPanel("max_participants"),
-                FieldPanel("show_commitment"),
-            ]
-        ),
-        FieldPanel("accessibility"),
+        MultiFieldPanel([
+            FieldPanel("public"),
+            FieldPanel("send_reminders"),
+            FieldPanel("max_participants"),
+            FieldPanel("show_commitment"),
+            FieldPanel("accessibility"),
+        ]),
     ]
 
     @property

@@ -27,6 +27,8 @@ def _upcoming_actions(time_now, hours):
 def _send_reminders(hours, reminder_type):
     time_now = now()
     actions = _upcoming_actions(time_now, hours)
+    actions = actions.filter(Q(send_reminders__isnull=True) | Q(send_reminders=True))
+
 
     logger.info("checking reminders for %s", reminder_type)
     action_count = actions.count()
@@ -36,6 +38,10 @@ def _send_reminders(hours, reminder_type):
     logger.info("notifying attendees that haven't been notified since %s", notification_cutoff)
 
     for action in actions:
+
+        # Filter actions that don't have reminders set.
+        if not action.send_reminders:
+            continue
 
         attendees = (
             Attendee.objects.filter(action=action)
