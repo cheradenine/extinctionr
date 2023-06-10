@@ -20,24 +20,42 @@ logger = logging.getLogger(__name__)
 def _upcoming_actions(time_now, hours):
     start = time_now + timedelta(hours=hours, minutes=-30)
     end = time_now + timedelta(hours=hours, minutes=30)
+    logger.info(
+        "Looking for events within: \n  %s\n  %s",
+        format_time_for_log(start),
+        format_time_for_log(end)
+    )
     return Action.objects.filter(when__range=(start, end))
+
+
+def format_time_for_log(time):
+    return dateformat.format(time, "l, F jS @ g:iA")
 
 
 @sync_to_async
 def _send_reminders(hours, reminder_type):
     time_now = now()
+    logger.info(
+        "checking reminders for %s. UTC time is %s",
+        reminder_type,
+        format_time_for_log(time_now)
+    )
+
     actions = _upcoming_actions(time_now, hours)
-    actions = actions.filter(Q(send_reminders__isnull=True) | Q(send_reminders=True))
 
-
-    logger.info("checking reminders for %s", reminder_type)
-    action_count = actions.count()
-    logger.info("found %d action%s", action_count, "" if action_count == 1 else "s")
+    if not actions:
+        logger.info("No upcoming actions")
+        return
 
     notification_cutoff = time_now - timedelta(days=1)
     logger.info("notifying attendees that haven't been notified since %s", notification_cutoff)
 
     for action in actions:
+
+        logger.info(
+            "Sending notification for action starting at:\n  %s",
+            format_time_for_log(action.when)
+        )
 
         attendees = (
             Attendee.objects.filter(action=action)
@@ -63,9 +81,9 @@ def _send_reminders(hours, reminder_type):
 async def run_reminders():
     logger.info("Starting reminders service")
     while True:
-        # Sleep for 30 mins
-        sleep_time = 30 * 60
-        await asyncio.sleep(sleep_time)
+        # Sleep for 10 mins
+        sleep_time_seconds = 10 * 60
+        await asyncio.sleep(sleep_time_seconds)
         await _send_reminders(26, EventReminder.NEXT_DAY)
         await _send_reminders(2, EventReminder.SOON)
 
