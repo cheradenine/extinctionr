@@ -140,6 +140,7 @@ MIDDLEWARE = [
 ]
 if DEBUG:
     try:
+        # trunk-ignore(ruff/F401)
         import debug_toolbar
 
         INSTALLED_APPS += ["debug_toolbar"]
@@ -371,6 +372,7 @@ EXPLORER_SCHEMA_INCLUDE_TABLE_PREFIXES = (
 # Mailman API credentials
 MAILMAN_REST_API_URL = "http://localhost:9001"
 MAILMAN_REST_API_USER = "restadmin"
+# trunk-ignore(bandit/B105)
 MAILMAN_REST_API_PASS = "restpass"
 POSTORIUS_TEMPLATE_BASE_URL = "http://localhost:8000"
 
@@ -387,4 +389,5 @@ WAGTAIL_USER_EDIT_FORM = "extinctionr.vaquita.forms.CustomUserEditForm"
 WAGTAIL_USER_CREATION_FORM = "extinctionr.vaquita.forms.CustomUserCreationForm"
 WAGTAIL_USER_CUSTOM_FIELDS = ["username"]
 
-AN_API_KEY = "Debug"
+AN_API_KEY = ""
+AN_SIGNUP_FORM_ID = ""
