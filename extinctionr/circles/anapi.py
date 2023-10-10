@@ -1,11 +1,37 @@
 import requests
 import uuid
 import logging
+from http.client import HTTPConnection
+from contextlib import contextmanager
 
 from django.conf import settings
 
 
 logger = logging.getLogger("circles.anapi")
+
+
+@contextmanager
+def verbose_http_logging(payload):
+    http_debug_level = HTTPConnection.debuglevel
+    HTTPConnection.debuglevel = 1
+
+    root_logger = logging.getLogger()
+    root_log_level = root_logger.level
+    root_logger.setLevel(logging.DEBUG)
+
+    requests_logger = logging.getLogger("urllib3")
+    requests_log_level = requests_logger.level
+    requests_log_propagate = requests_logger.propagate
+    requests_logger.setLevel(logging.DEBUG)
+    requests_logger.propagate = True
+    try:
+        root_logger.info(payload)
+        yield
+    finally:
+        requests_logger.propagate = requests_log_propagate
+        requests_logger.setLevel(requests_log_level)
+        root_logger.setLevel(root_log_level)
+        HTTPConnection.debuglevel = http_debug_level
 
 
 def add_to_action_networks(contact):
@@ -40,7 +66,8 @@ def add_to_action_networks(contact):
         "person": person,
         "triggers": {"autoresponse": {"enabled": True}},
     }
-    resp = requests.post(signup_url, headers=headers, json=payload, timeout=10.0)
 
-    if resp.status_code != 200:
-        logger.error("POST to %s failed: %s", signup_url, resp.text)
+    with verbose_http_logging(payload):
+        resp = requests.post(signup_url, headers=headers, json=payload, timeout=10.0)
+        if resp.status_code != 200:
+            logger.error("POST to %s failed: %s", signup_url, resp.text)
