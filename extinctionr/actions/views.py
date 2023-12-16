@@ -51,6 +51,26 @@ class ActionForm(forms.ModelForm):
         )
 
 
+class HoneypotField(forms.CharField):
+    default_widget = forms.TextInput(
+        attrs={
+            "tabindex": "-1",
+            "autocomplete": "off",
+        }
+    )
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", HoneypotField.default_widget)
+        kwargs["required"] = False
+        super().__init__(*args, **kwargs)
+
+    def clean(self, value):
+        if cleaned_value := super().clean(value):
+            raise forms.ValidationError("")
+        else:
+            return cleaned_value
+
+
 class SignupForm(forms.Form):
     email = forms.EmailField(
         label="Email",
@@ -80,6 +100,10 @@ class SignupForm(forms.Form):
             attrs={"class": "form-control text-center", "min": 0, "max": 1000}
         ),
     )
+
+    # This is not filed in and is hidden on the page. If a post comes back with
+    # this filled in then it is likely a bot.
+    rsvp_comment = HoneypotField()
 
     def __init__(self, *args, **kwargs):
         self.action = kwargs.pop("action")
@@ -165,6 +189,7 @@ def build_action_full_url(action, request):
 # Weird thing Google puts in for video conferencing.
 ICS_VIDEO_CONFERENCE_SEP = "-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-"
 
+
 def action_to_ical_event(action):
     from icalendar import Event, vText, vCalAddress, vDatetime
     from pytz import timezone
@@ -193,8 +218,8 @@ def action_to_ical_event(action):
     # when we have more time and patience to work on it.
     if action.virtual:
         dlines = [
-            f"Join online: <a href=\"{action.location}\">{action.location}</a>\n",
-            f"Event details: <a href=\"{action.full_url}\">{action.full_url}</a>\n",
+            f'Join online: <a href="{action.location}">{action.location}</a>\n',
+            f'Event details: <a href="{action.full_url}">{action.full_url}</a>\n',
             f"{action.description}\n",
             ICS_VIDEO_CONFERENCE_SEP,
             "Do not edit this section of the description.\n",
@@ -327,7 +352,6 @@ def list_actions(request):
     week_actions = []
 
     for daynum, mdate in enumerate(cal_days, 1):
-
         # produce a list of actions for each day.
         day_actions = list(map(_add_action_tag_color, actions_by_day[mdate]))
 
