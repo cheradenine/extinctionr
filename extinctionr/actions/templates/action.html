@@ -61,6 +61,11 @@
     margin: 0px !important;
 	max-width: 100%;
 }
+#id_rsvp_comment {
+	width: 0px;
+	height: 0px;
+	display:none !important;
+}
 {% endblock %}
 {% block content %}
 {% load tz %}
@@ -159,6 +164,10 @@ not working yet because we need actual address data for events.
 				<div class="col-5 px-1">
 					{{form.name}}
 					<div class="text-danger">{{form.name.errors}}</div>
+				</div>
+				<div>
+					{{form.rsvp_comment}}
+					<div class="text-danger">{{form.rsvp_comment.errors}}</div>
 				</div>
 				<div class="col-2 pr-0 pl-1">
 					<input class="btn btn-success text-uppercase px-0 w-100" type="submit" value="RSVP">
