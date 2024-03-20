@@ -184,8 +184,14 @@ table a:hover {
     {%endfor%}
     {% else %}
     <div class="col m-2 text-center">
-        <p>There are no upcoming events.</p>
+        <p>There are no upcoming {% if current_tag == "talk" %}talks{% else %}events{% endif %}.</p>
         <p>Why not <a href="/talk">propose a location for a talk</a> in your area?</p>
+        <p>or watch</p>
+        <p>
+            <a href="https://tube.rebellion.global/w/cyiTt1E1GBAvGb24eDhMMh">
+                <h5>Heading for Extinction and What to Do About It</h5>
+            </a>
+        </p>
     </div>
     {% endif %}
 
