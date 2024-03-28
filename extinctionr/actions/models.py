@@ -81,7 +81,7 @@ class Action(models.Model):
         help_text="Whether to show the conditional commitment fields",
     )
     max_participants = models.IntegerField(
-        blank=True, default=0, help_text="Maximun number of people allowed to register"
+        blank=True, default=0, help_text="Maximun number of people allowed to register (or 0 if there is no limit)"
     )
     accessibility = models.TextField(
         default="",
@@ -175,6 +175,8 @@ class Action(models.Model):
         return f"{self.name} on {self.when.strftime('%b %e, %Y @ %H:%M')}"
 
     def save(self, *args, **kwargs):
+        if self.max_participants is None:
+            self.max_participants = 0
         ret = super().save(*args, **kwargs)
         for role in self.available_role_choices:
             ActionRole.objects.get_or_create(name=role)
