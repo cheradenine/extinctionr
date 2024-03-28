@@ -59,8 +59,8 @@ def add_to_action_networks(contact):
     if contact.address:
         person["postal_addresses"] = [{"postal_code": contact.address.postcode}]
 
-    if contact.phone:
-        person["phone_numbers"] = [contact.phone.as_national]
+    if contact.phone and contact.phone.as_national:
+        person["phone_number"] = [{"number" : str(contact.phone.national_number)}]
 
     payload = {
         "person": person,

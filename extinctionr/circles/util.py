@@ -65,17 +65,19 @@ abbrev_us_state = dict(map(reversed, us_state_abbrev.items()))
 
 # Get city, state from zipcode
 def zipcode_lookup(zipcode):
-    nominatim_url = 'https://nominatim.openstreetmap.org/search?postalcode={0}&country=us&format=json&addressdetails=1'.format(zipcode)
-    r = requests.get(nominatim_url)
-    geo_data = r.json()
-    addresses = [geo['address'] for geo in geo_data]
     state = ''
     city = ''
-    for address in addresses:
-        if not state and 'state' in address:
-            state = us_state_abbrev[address['state']]
-        if 'city' in address:
-            return (address['city'], state)
-        if 'town' in address:
-            return (address['town'], state)
+
+    nominatim_url = 'https://nominatim.openstreetmap.org/search?postalcode={0}&country=us&format=json&addressdetails=1'.format(zipcode)
+    r = requests.get(nominatim_url)
+    if r.ok:
+        geo_data = r.json()
+        addresses = [geo['address'] for geo in geo_data]
+        for address in addresses:
+            if not state and 'state' in address:
+                state = us_state_abbrev[address['state']]
+            if 'city' in address:
+                return (address['city'], state)
+            if 'town' in address:
+                return (address['town'], state)
     return city, state
