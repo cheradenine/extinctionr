@@ -46,8 +46,10 @@
       <a href="{% url 'extinctionr.info:page' page='about' %}#principles"
         >principles.</a
       >
+      </p>
+      <p>
+      XR is active in 87 countries and there with 993 groups!
     </p>
-    <br />
     <p>
       Find your local group on the map or
       <a href="mailto:outreach@xrboston.org">contact us</a> for help
@@ -69,10 +71,12 @@
   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
   crossorigin=""
 ></script>
+<!--
 <script
   type="text/javascript"
   src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js"
 ></script>
+-->
 <script type="text/javascript">
   $(function () {
     // set up max bounds:
@@ -110,13 +114,11 @@
       map.on("moveend", logMap);
       map.on("zoomend", logMap);
     }
-    L.tileLayer(
-      "https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg",
-      {
-        attribution:
-          'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-      }
-    ).addTo(map);
+    
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      minZoom: 0,
+      maxZoom: 18
+    }).addTo(map);
 
     let xr_icon = L.icon({
       iconUrl: "/static/images/X-symbol-green-alpha-128.png",
