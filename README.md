@@ -32,6 +32,7 @@ And now in that directory your path will point to that python. You can verify th
 ```
 python --version
 ```
+Should print `Python 3.8.10`
 
 ## Create a python virtual environment
 This is needed to manage all of the python packages that the project requires.
@@ -46,7 +47,6 @@ source ./venv/bin/activate
 git clone <this project>
 cd extinctionr
 
-pip install django
 pip install -r requirements.txt
 
 python manage.py migrate
