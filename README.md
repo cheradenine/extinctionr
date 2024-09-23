@@ -47,6 +47,7 @@ source ./venv/bin/activate
 git clone <this project>
 cd extinctionr
 
+pip install Django==3.2.8
 pip install -r requirements.txt
 
 python manage.py migrate
