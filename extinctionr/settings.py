@@ -36,6 +36,8 @@ ALLOWED_HOSTS = [
 
 SITE_ID = 1
 
+APPEND_SLASH = True
+
 # Application definition
 
 INSTALLED_APPS = [

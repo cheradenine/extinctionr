@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load info %}
+{% load static %}
+{% load tz %}
+{% load wagtailcore_tags wagtailimages_tags %}
+{% block body_class %}template-newsindexpage{% endblock %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="{% static 'css/xr-blog.css' %}">
+{% endblock %}
+{% block title %}:: Stories{% endblock %}
+{% block og_tags %}
+  <meta property="og:description" content="News and Stories from Extinction Rebellion Boston" />
+{% endblock %}
+{% block inline_css %}
+
+{{block.super}}
+
+{% endblock %}
+{% block content %}
+
+{% with page=page.specific %}
+
+<div class="row">
+    <div class="banner position-relative w-100">
+        {% if page.hero_image %}
+        {% image page.hero_image max-1280x512 class="img-fluid w-100" %}
+        {% endif %}
+      <div class="banner-title">{{page.hero_text}}</div>
+    </div>
+  </div>
+  
+  <div class="row py-5 px">
+    <div class="col col-text p-0">
+          <!-- consider a separate grid here with rows for each block -->
+        {% for block in page.content %}
+          {% if block.block_type == 'image' %}
+            {% image block.value.image fill-1024x576 %}
+            {% if block.value.caption %}
+            <div class="small">{{block.value.caption}}</div>
+            {% endif %}
+          {% else %}
+            {% include_block block %}
+          {% endif %}
+        {% endfor %}
+    </div>
+  </div>
+
+{% endwith %}
+{% endblock %}

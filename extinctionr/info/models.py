@@ -5,6 +5,23 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from markdownx.models import MarkdownxField
 
+from wagtail.core.blocks import (
+    RichTextBlock, BlockQuoteBlock, CharBlock, StructBlock
+)
+from wagtail.admin.edit_handlers import (
+    FieldPanel, InlinePanel, MultiFieldPanel, StreamFieldPanel,
+    PageChooserPanel, FieldRowPanel
+)
+from wagtail.images.edit_handlers import ImageChooserPanel
+
+from wagtail.images.blocks import ImageChooserBlock
+from wagtail.core.fields import RichTextField, StreamField
+from wagtail.core.models import Page, Orderable
+
+# TODO: should move this to vaquita instead of reaching up into news.
+from extinctionr.news.blocks import EmbedContentBlock
+from extinctionr.vaquita.blocks import ZOrderMarkdownBlock
+
 
 class PressReleaseManager(models.Manager):
     def released(self):
@@ -61,4 +78,38 @@ class Chapter(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# An editable page that can go at the top level of navigation.
+class InfoPage(Page):
+    subpage_types = []
+    parent_page_types = ["wagtailcore.Page"]
+    hero_text = models.TextField("hero text")
+    hero_image = models.ForeignKey(
+        "vaquita.CustomImage",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    content = StreamField(
+        [
+            ('paragraph', RichTextBlock(features=[
+                'h2', 'h3', 'bold', 'italic', 'link', 'ol', 'ul'
+            ])),
+            ('markdown', ZOrderMarkdownBlock(icon='code')),
+            ('image', StructBlock([
+                ('image', ImageChooserBlock()),
+                ('caption', CharBlock(required=False))
+            ])),
+            ('quote', BlockQuoteBlock()),
+            ('embedded_content', EmbedContentBlock()),
+        ]
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel('hero_text'),
+        ImageChooserPanel('hero_image'),
+        StreamFieldPanel('content'),
+    ]
 
