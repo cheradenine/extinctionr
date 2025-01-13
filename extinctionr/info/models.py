@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from markdownx.models import MarkdownxField
 
 from wagtail.core.blocks import (
-    RichTextBlock, BlockQuoteBlock, CharBlock, StructBlock
+    RichTextBlock, BlockQuoteBlock, CharBlock, StructBlock, RawHTMLBlock
 )
 from wagtail.admin.edit_handlers import (
     FieldPanel, InlinePanel, MultiFieldPanel, StreamFieldPanel,
@@ -104,6 +104,7 @@ class InfoPage(Page):
             ])),
             ('quote', BlockQuoteBlock()),
             ('embedded_content', EmbedContentBlock()),
+            ('html', RawHTMLBlock(icon='code')),
         ]
     )
 
